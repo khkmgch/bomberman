@@ -1,0 +1,14 @@
+FROM node:18.14.0-alpine3.17
+
+WORKDIR /app
+
+COPY package.json ./
+COPY yarn.lock ./
+
+RUN yarn install
+
+COPY . .
+
+EXPOSE 5000
+
+CMD ["yarn", "run", "start:dev"]
