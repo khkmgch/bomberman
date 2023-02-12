@@ -1,9 +1,33 @@
 import { useState } from 'react';
 import reactLogo from './assets/react.svg';
 import './App.css';
+import { io } from 'socket.io-client';
+
+const socket = io(`${import.meta.env.VITE_API_URL}`);
 
 function App() {
   const [count, setCount] = useState(0);
+
+  socket.on('connect', function () {
+    console.log('Connected');
+
+    socket.emit('events', { test: 'test' });
+    socket.emit('identity', 0, (response) =>
+      console.log('Identity:', response)
+    );
+    socket.emit('message', { message: 'testMessage' }, (response) => {
+      console.log('message', response);
+    });
+  });
+  socket.on('events', function (data) {
+    console.log('event', data);
+  });
+  socket.on('exception', function (data) {
+    console.log('event', data);
+  });
+  socket.on('disconnect', function () {
+    console.log('Disconnected');
+  });
 
   return (
     <div className='App'>
