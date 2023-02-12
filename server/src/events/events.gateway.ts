@@ -12,7 +12,7 @@ import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
   cors: {
-    origin: '*'
+    origin: 'http://localhost:5173' || 'https://bomberman-fawn.vercel.app',
   },
 })
 export class EventsGateway {
