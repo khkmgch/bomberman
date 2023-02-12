@@ -15,6 +15,7 @@ import { Server, Socket } from 'socket.io';
     origin: [
       'http://localhost:5173',
       'https://bomberman-9t7ips6ev-khkmgch.vercel.app',
+      '*'
     ],
   },
 })
