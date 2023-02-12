@@ -12,10 +12,10 @@ function App() {
     console.log('Connected');
 
     socket.emit('events', { test: 'test' });
-    socket.emit('identity', 0, (response) =>
+    socket.emit('identity', 0, (response: number) =>
       console.log('Identity:', response)
     );
-    socket.emit('message', { message: 'testMessage' }, (response) => {
+    socket.emit('message', { message: 'testMessage' }, (response: string) => {
       console.log('message', response);
     });
   });
