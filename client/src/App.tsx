@@ -1,33 +1,16 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
+import { useRef, useState } from 'react';
+import reactLogo from '/assets/react.svg';
 import './App.css';
 import { io } from 'socket.io-client';
-
-const socket = io(`${import.meta.env.VITE_API_URL}`);
+import { useGame } from './hooks/useGame';
+import gameConfig from './game/gameConfig';
 
 function App() {
   const [count, setCount] = useState(0);
 
-  socket.on('connect', function () {
-    console.log('Connected');
+  const parentEl = useRef<HTMLDivElement>(null);
 
-    socket.emit('events', { test: 'test' });
-    socket.emit('identity', 0, (response: number) =>
-      console.log('Identity:', response)
-    );
-    socket.emit('message', { message: 'testMessage' }, (response: string) => {
-      console.log('message', response);
-    });
-  });
-  socket.on('events', function (data) {
-    console.log('event', data);
-  });
-  socket.on('exception', function (data) {
-    console.log('event', data);
-  });
-  socket.on('disconnect', function () {
-    console.log('Disconnected');
-  });
+  useGame(gameConfig, parentEl);
 
   return (
     <div className='App'>
@@ -51,6 +34,7 @@ function App() {
       <p className='read-the-docs'>
         Click on the Vite and React logos to learn more
       </p>
+      <div ref={parentEl} id='phaser-game'></div>
     </div>
   );
 }
