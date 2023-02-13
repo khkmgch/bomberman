@@ -21,23 +21,23 @@ export class EventsGateway {
 
   private logger: Logger = new Logger('EventsGateway');
 
-  @SubscribeMessage('events')
-  findAll(@MessageBody() data: any): Observable<WsResponse<number>> {
-    console.log(data);
-    return from([1, 2, 3]).pipe(
-      map((item) => ({ event: 'events', data: item })),
-    );
-  }
+  // @SubscribeMessage('events')
+  // findAll(@MessageBody() data: any): Observable<WsResponse<number>> {
+  //   console.log(data);
+  //   return from([1, 2, 3]).pipe(
+  //     map((item) => ({ event: 'events', data: item })),
+  //   );
+  // }
 
-  @SubscribeMessage('identity')
-  async identity(@MessageBody() data: number): Promise<number> {
-    return data;
-  }
+  // @SubscribeMessage('identity')
+  // async identity(@MessageBody() data: number): Promise<number> {
+  //   return data;
+  // }
 
-  @SubscribeMessage('message')
-  handleMessage(client: any, payload: any): string {
-    return 'Hello world!';
-  }
+  // @SubscribeMessage('message')
+  // handleMessage(client: any, payload: any): string {
+  //   return 'Hello world!';
+  // }
 
   afterInit(server: Server) {
     //初期化
