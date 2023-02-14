@@ -3,7 +3,7 @@ import reactLogo from '/assets/react.svg';
 import './App.css';
 import { io } from 'socket.io-client';
 import { useGame } from './hooks/useGame';
-import gameConfig from './game/gameConfig';
+import gameConfig from './config/gameConfig';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -14,6 +14,7 @@ function App() {
 
   return (
     <div className='App'>
+      {/* <h1 className='text-3xl font-bold underline'>Hello world!</h1>
       <div>
         <a href='https://vitejs.dev' target='_blank' rel='noreferrer'>
           <img src='/vite.svg' className='logo' alt='Vite logo' />
@@ -33,7 +34,7 @@ function App() {
       </div>
       <p className='read-the-docs'>
         Click on the Vite and React logos to learn more
-      </p>
+      </p> */}
       <div ref={parentEl} id='phaser-game'></div>
     </div>
   );
