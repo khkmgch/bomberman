@@ -43,8 +43,8 @@ export default class Title extends Scene {
       fontFamily: 'PressStart2P',
       color: '#fff',
     });
-    this.add.text(centerX - 300, centerY + 100, 'Bomberman', {
-      fontSize: '64px',
+    this.add.text(centerX - 250, centerY + 100, 'Bomberman', {
+      fontSize: '96px',
       fontFamily: 'Ranchers',
       color: '#fff',
     });
