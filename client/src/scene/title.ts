@@ -38,8 +38,14 @@ export default class Title extends Scene {
   create() {
     const { centerX, centerY } = this.cameras.main;
 
-    this.add.text(centerX - 100, centerY, 'Title', {
-      fontSize: '32px',
+    this.add.text(centerX - 300, centerY, 'Bomberman', {
+      fontSize: '64px',
+      fontFamily: 'PressStart2P',
+      color: '#fff',
+    });
+    this.add.text(centerX - 300, centerY + 100, 'Bomberman', {
+      fontSize: '64px',
+      fontFamily: 'Ranchers',
       color: '#fff',
     });
   }

@@ -1,3 +1,16 @@
+@font-face {
+  font-family: 'PressStart2P';
+  src: url('assets/font/PressStart2P-Regular.ttf');
+  font-weight: 400;
+  font-weight: normal;
+}
+@font-face {
+  font-family: 'Ranchers';
+  src: url('assets/font/Ranchers-Regular.ttf');
+  font-weight: 400;
+  font-weight: normal;
+}
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
