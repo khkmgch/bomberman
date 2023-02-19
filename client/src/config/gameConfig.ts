@@ -1,14 +1,14 @@
 import Phaser from 'phaser';
 import Preloader from '../scene/preloader';
 import Title from '../scene/title';
-import * as Constants from '../../../server/src/constants';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
-
+import Constant from '../../../server/src/constant';
+import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 const gameConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   scale: {
-    width: Constants.CANVAS.WIDTH,
-    height: Constants.CANVAS.HEIGHT,
+    width: Constant.CANVAS.WIDTH,
+    height: Constant.CANVAS.HEIGHT,
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
@@ -24,16 +24,15 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
     pixelArt: true,
     roundPixels: true,
   },
+  backgroundColor: '#ffffff',
   scene: [Preloader, Title],
-  // backgroundColor: '#a9a9a9',
   plugins: {
     scene: [
       {
         key: 'rexUI',
-        plugin: RexUIPlugin,
+        plugin: UIPlugin,
         mapping: 'rexUI',
       },
-      // ...
     ],
   },
 };
