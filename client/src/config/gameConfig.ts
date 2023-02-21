@@ -3,6 +3,7 @@ import Preloader from '../scene/preloader';
 import Title from '../scene/title';
 import Constant from '../../../server/src/constant';
 import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
+import Lobby from '../scene/lobby';
 const gameConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   scale: {
@@ -24,7 +25,7 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
     roundPixels: true,
   },
   backgroundColor: Constant.COLOR_STRING.WHITE,
-  scene: [Preloader, Title],
+  scene: [Preloader, Title, Lobby],
   plugins: {
     scene: [
       {

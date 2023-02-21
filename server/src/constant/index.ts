@@ -1,7 +1,8 @@
 export default class Constant {
-  static readonly SCENES = {
+  static readonly SCENE = {
     PRELOADER: 'Preloader',
     TITLE: 'Title',
+    LOBBY: 'Lobby',
   };
 
   static readonly TILE = {
@@ -59,9 +60,12 @@ export default class Constant {
   static readonly COLOR_NUMBER = {
     CHARCOAL_GRAY: 0x4e454a,
     POWDER_PINK: 0xf5ecf4,
+    LOTUS_PINK: 0xde82a7,
   };
   static readonly COLOR_STRING = {
     WHITE: '#ffffff',
+    POWDER_PINK: '#f5ecf4',
     CHARCOAL_GRAY: '#4e454a',
+    LOTUS_PINK: '#de82a7',
   };
 }
