@@ -17,6 +17,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src"],
+  "include": ["src", "node_modules/phaser3-rex-plugins-types"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
