@@ -6,7 +6,7 @@ export default class Title extends Scene {
   private socket: Socket;
 
   constructor() {
-    super(Constant.SCENES.TITLE);
+    super(Constant.SCENE.TITLE);
   }
 
   init(data: { socket: Socket }) {
@@ -46,7 +46,10 @@ export default class Title extends Scene {
       .play(Constant.BACKGROUND, true);
 
     //タイトル
-    TitleUtil.createTitleText(this, centerX - 330, centerY - 350);
+    TitleUtil.createTitleText(this, centerX - 340, centerY - 350);
+
+    //スタートボタン
+    TitleUtil.createStartBtn(this, centerX, centerY - 60);
 
     //遊び方
     TitleUtil.createUsageTextBox(this, centerX - 440, centerY + 50, {
@@ -58,5 +61,16 @@ export default class Title extends Scene {
     TitleUtil.createMoveUsage(this, centerX, centerY + 150);
     //Bomb
     TitleUtil.createBombUsage(this, centerX - 440, centerY + 150);
+
+    //GitHub Button
+    TitleUtil.createGitHubBtn(this, centerX, centerY + 420);
+
+    this.events.on('start_lobby', this.startLobby, this);
+  }
+
+  startLobby() {
+    this.scene.start(Constant.SCENE.LOBBY, {
+      socket: this.socket,
+    });
   }
 }

@@ -7,7 +7,7 @@ export default class Preloader extends Scene {
   private socket: Socket;
 
   constructor() {
-    super(Constant.SCENES.PRELOADER);
+    super(Constant.SCENE.PRELOADER);
   }
 
   init() {
@@ -82,7 +82,7 @@ export default class Preloader extends Scene {
     AnimationUtil.createBombAnim(this.anims);
     AnimationUtil.createExplosionAnim(this.anims);
 
-    this.scene.start(Constant.SCENES.TITLE, {
+    this.scene.start(Constant.SCENE.TITLE, {
       socket: this.socket,
     });
   }
