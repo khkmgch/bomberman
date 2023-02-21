@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 import Preloader from '../scene/preloader';
 import Title from '../scene/title';
-import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import Constant from '../../../server/src/constant';
 import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 const gameConfig: Phaser.Types.Core.GameConfig = {
@@ -24,7 +23,7 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
     pixelArt: true,
     roundPixels: true,
   },
-  backgroundColor: '#ffffff',
+  backgroundColor: Constant.COLOR_STRING.WHITE,
   scene: [Preloader, Title],
   plugins: {
     scene: [

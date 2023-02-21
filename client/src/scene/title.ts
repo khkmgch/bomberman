@@ -1,11 +1,12 @@
 import { Scene } from 'phaser';
 import { io, Socket } from 'socket.io-client';
-import * as Constants from '../../../server/src/constants';
+import Constant from '../../../server/src/constant';
+import TitleUtil from '../util/titleUtil';
 export default class Title extends Scene {
   private socket: Socket;
 
   constructor() {
-    super(Constants.SCENES.TITLE);
+    super(Constant.SCENES.TITLE);
   }
 
   init(data: { socket: Socket }) {
@@ -38,15 +39,24 @@ export default class Title extends Scene {
   create() {
     const { centerX, centerY } = this.cameras.main;
 
-    this.add.text(centerX - 300, centerY, 'Bomberman', {
-      fontSize: '64px',
-      fontFamily: 'PressStart2P',
-      color: '#fff',
+    //背景
+    this.add
+      .sprite(0, 0, Constant.BACKGROUND)
+      .setOrigin(0, 0)
+      .play(Constant.BACKGROUND, true);
+
+    //タイトル
+    TitleUtil.createTitleText(this, centerX - 330, centerY - 350);
+
+    //遊び方
+    TitleUtil.createUsageTextBox(this, centerX - 440, centerY + 50, {
+      wrapWidth: 880,
+      fixedWidth: 880,
+      fixedHeight: 300,
     });
-    this.add.text(centerX - 250, centerY + 100, 'Bomberman', {
-      fontSize: '96px',
-      fontFamily: 'Ranchers',
-      color: '#fff',
-    });
+    //Move
+    TitleUtil.createMoveUsage(this, centerX, centerY + 150);
+    //Bomb
+    TitleUtil.createBombUsage(this, centerX - 440, centerY + 150);
   }
 }

@@ -1,12 +1,13 @@
 import { Scene } from 'phaser';
 import { io, Socket } from 'socket.io-client';
-import * as Constants from '../../../server/src/constants';
+import Constant from '../../../server/src/constant';
+import AnimationUtil from '../util/animationUtil';
 
 export default class Preloader extends Scene {
   private socket: Socket;
 
   constructor() {
-    super(Constants.SCENES.PRELOADER);
+    super(Constant.SCENES.PRELOADER);
   }
 
   init() {
@@ -26,25 +27,62 @@ export default class Preloader extends Scene {
       color: '#fff',
     });
 
-    const frameWidth = Constants.TIP_SIZE;
-    const frameHeight = Constants.TIP_SIZE;
+    const frameWidth = Constant.TIP_SIZE;
+    const frameHeight = Constant.TIP_SIZE;
 
-    for (let value of Object.values(Constants.CHATACTERS)) {
+    //背景
+    this.load.spritesheet(
+      Constant.BACKGROUND,
+      `assets/ui/${Constant.BACKGROUND}.png`,
+      {
+        frameWidth: 960,
+        frameHeight: 1000,
+      }
+    );
+
+    //キャラクター
+    for (let value of Object.values(Constant.CHARACTER)) {
       this.load.spritesheet(value, `assets/character/${value}.png`, {
         frameWidth,
         frameHeight,
       });
     }
-    this.load.spritesheet('bomb', 'assets/attack/bomb.png', {
-      frameWidth,
-      frameHeight,
-    });
+    //猫
+    for (let value of Object.values(Constant.CAT)) {
+      this.load.spritesheet(value, `assets/character/cat/${value}.png`, {
+        frameWidth,
+        frameHeight,
+      });
+    }
+    //爆弾と爆風
+    for (let value of Object.values(Constant.ATTACK)) {
+      this.load.spritesheet(value, `assets/attack/${value}.png`, {
+        frameWidth,
+        frameHeight,
+      });
+    }
+
+    //矢印
+    for (let value of Object.values(Constant.ARROW)) {
+      this.load.image(value, `assets/ui/arrow/${value}.png`);
+    }
+
+    //github
+    this.load.image(Constant.GITHUB, `assets/ui/${Constant.GITHUB}.png`);
+
+    //space
+    this.load.image(Constant.SPACE, `assets/ui/${Constant.SPACE}.png`);
 
     this.load.once('complete', this.onLoadComplete, this);
   }
 
   onLoadComplete() {
-    this.scene.start(Constants.SCENES.TITLE, {
+    AnimationUtil.createBackgroundAnim(this.anims);
+    AnimationUtil.createCatAnim(this.anims);
+    AnimationUtil.createBombAnim(this.anims);
+    AnimationUtil.createExplosionAnim(this.anims);
+
+    this.scene.start(Constant.SCENES.TITLE, {
       socket: this.socket,
     });
   }
