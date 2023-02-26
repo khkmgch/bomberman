@@ -59,6 +59,7 @@ export default class Constant {
 
   static readonly COLOR_NUMBER = {
     CHARCOAL_GRAY: 0x4e454a,
+    PEACH: 0xfbd8b5,
     POWDER_PINK: 0xf5ecf4,
     LOTUS_PINK: 0xde82a7,
   };
@@ -66,6 +67,7 @@ export default class Constant {
     WHITE: '#ffffff',
     POWDER_PINK: '#f5ecf4',
     CHARCOAL_GRAY: '#4e454a',
+    MIST: '#b4aeb1',
     LOTUS_PINK: '#de82a7',
   };
 }
