@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { io, Socket } from 'socket.io-client';
 import Constant from '../../../server/src/constant';
+import SceneUtil from '../util/sceneUtil';
 import TitleUtil from '../util/titleUtil';
 export default class Title extends Scene {
   private socket: Socket;
@@ -40,10 +41,7 @@ export default class Title extends Scene {
     const { centerX, centerY } = this.cameras.main;
 
     //背景
-    this.add
-      .sprite(0, 0, Constant.BACKGROUND)
-      .setOrigin(0, 0)
-      .play(Constant.BACKGROUND, true);
+    SceneUtil.createBackground(this);
 
     //タイトル
     TitleUtil.createTitleText(this, centerX - 340, centerY - 350);

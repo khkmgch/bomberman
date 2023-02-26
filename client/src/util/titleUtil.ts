@@ -1,5 +1,4 @@
 import { Scene } from 'phaser';
-import Button from 'phaser3-rex-plugins/plugins/button';
 import Constant from '../../../server/src/constant';
 
 export default class TitleUtil {
@@ -63,10 +62,8 @@ export default class TitleUtil {
 
         background: scene.rexUI.add
           .roundRectangle(0, 0, 2, 2, 20, Constant.COLOR_NUMBER.POWDER_PINK)
-          .setStrokeStyle(2, Constant.COLOR_NUMBER.CHARCOAL_GRAY)
+          .setStrokeStyle(3, Constant.COLOR_NUMBER.CHARCOAL_GRAY)
           .setAlpha(0.6),
-
-        // icon: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 20, COLOR_DARK),
 
         text: TitleUtil.getBuiltInText(
           scene,
@@ -74,12 +71,6 @@ export default class TitleUtil {
           fixedWidth,
           fixedHeight
         ),
-        // text: getBBcodeText(scene, wrapWidth, fixedWidth, fixedHeight),
-
-        // action: scene.add
-        //   .image(0, 0, 'nextPage')
-        //   .setTint(COLOR_LIGHT)
-        //   .setVisible(false),
 
         space: {
           left: 0,
@@ -115,20 +106,6 @@ export default class TitleUtil {
       })
       .setFixedSize(fixedWidth, fixedHeight);
   }
-
-  // var getBBcodeText = function (scene, wrapWidth, fixedWidth, fixedHeight) {
-  //     return scene.rexUI.add.BBCodeText(0, 0, '', {
-  //         fixedWidth: fixedWidth,
-  //         fixedHeight: fixedHeight,
-
-  //         fontSize: '20px',
-  //         wrap: {
-  //             mode: 'word',
-  //             width: wrapWidth
-  //         },
-  //         maxLines: 3
-  //     })
-  // }
 
   static createMoveUsage(scene: Scene, x: number, y: number) {
     scene.add.image(x, y, Constant.ARROW.UP).setScale(0.8);
