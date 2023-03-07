@@ -1,7 +1,7 @@
 import { Scene } from 'phaser';
 import { io, Socket } from 'socket.io-client';
 import Constant from '../../../server/src/constant';
-import AnimationUtil from '../util/animationUtil';
+import AnimationUtil from '../utils/AnimationUtil';
 
 export default class Preloader extends Scene {
   private socket: Socket;
@@ -10,7 +10,7 @@ export default class Preloader extends Scene {
     super(Constant.SCENE.PRELOADER);
   }
 
-  init() {
+  public init() {
     const socket = io(`${import.meta.env.VITE_API_URL}`);
     this.socket = socket;
 
@@ -19,7 +19,7 @@ export default class Preloader extends Scene {
     });
   }
 
-  preload() {
+  public preload() {
     const { centerX, centerY } = this.cameras.main;
 
     this.add.text(centerX - 100, centerY, 'Loading...', {
@@ -76,7 +76,7 @@ export default class Preloader extends Scene {
     this.load.once('complete', this.onLoadComplete, this);
   }
 
-  onLoadComplete() {
+  private onLoadComplete() {
     AnimationUtil.createBackgroundAnim(this.anims);
     AnimationUtil.createCatAnim(this.anims);
     AnimationUtil.createBombAnim(this.anims);
