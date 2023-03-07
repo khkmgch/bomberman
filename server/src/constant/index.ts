@@ -3,7 +3,20 @@ export default class Constant {
     PRELOADER: 'Preloader',
     TITLE: 'Title',
     LOBBY: 'Lobby',
+    GAME: 'Game',
   };
+
+  static readonly MAX_PLAYERS_PER_ROOM = 4;
+  static readonly USER_KICK_TIMEOUT = 60_000; // 1 minute
+
+  static readonly PLAYER_STATE = {
+    WAITING: 'WAITING',
+    READY: 'READY',
+    PLAYING: 'PLAYING',
+    FINISHED: 'FINISHED',
+  };
+
+  /* サイズ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
   static readonly TILE = {
     SIZE: 64,
@@ -32,9 +45,9 @@ export default class Constant {
 
   static readonly CAT = {
     WHITE: 'cat_white',
-    BLACK: 'cat_black',
-    BRONZE: 'cat_bronze',
     BEIGE: 'cat_beige',
+    BRONZE: 'cat_bronze',
+    BLACK: 'cat_black',
   };
 
   static readonly BACKGROUND = 'background';
@@ -59,9 +72,13 @@ export default class Constant {
 
   static readonly COLOR_NUMBER = {
     CHARCOAL_GRAY: 0x4e454a,
+    MIST: 0xb4aeb1,
+    CORK: 0xc49a6a,
     PEACH: 0xfbd8b5,
     POWDER_PINK: 0xf5ecf4,
     LOTUS_PINK: 0xde82a7,
+    NAPLES_YELLOW: 0xfdd35c,
+    TURQUOISE_BLUE: 0x00afcc,
   };
   static readonly COLOR_STRING = {
     WHITE: '#ffffff',
@@ -70,4 +87,7 @@ export default class Constant {
     MIST: '#b4aeb1',
     LOTUS_PINK: '#de82a7',
   };
+
+  /* テキスト - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+  static readonly NO_ROOM_TEXT = 'No Rooms ... ';
 }

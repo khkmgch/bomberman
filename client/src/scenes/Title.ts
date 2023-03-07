@@ -1,8 +1,8 @@
 import { Scene } from 'phaser';
 import { io, Socket } from 'socket.io-client';
 import Constant from '../../../server/src/constant';
-import SceneUtil from '../util/sceneUtil';
-import TitleUtil from '../util/titleUtil';
+import SceneUtil from '../utils/SceneUtil';
+import TitleUtil from '../utils/TitleUtil';
 export default class Title extends Scene {
   private socket: Socket;
 
@@ -10,34 +10,12 @@ export default class Title extends Scene {
     super(Constant.SCENE.TITLE);
   }
 
-  init(data: { socket: Socket }) {
+  public init(data: { socket: Socket }) {
     this.socket = data.socket;
-    console.log(`id : ${this.socket.id}`);
-
-    // this.socket.emit('events', { test: 'test' });
-    // this.socket.emit('identity', 0, (response: number) =>
-    //   console.log('Identity:', response)
-    // );
-    // this.socket.emit(
-    //   'message',
-    //   { message: 'testMessage' },
-    //   (response: string) => {
-    //     console.log('message', response);
-    //   }
-    // );
-
-    // this.socket.on('events', function (data) {
-    //   console.log('event', data);
-    // });
-    // this.socket.on('exception', function (data) {
-    //   console.log('event', data);
-    // });
-    this.socket.on('disconnect', function () {
-      console.log('サーバーとのソケット接続が切れました。');
-    });
+    // console.log(`id : ${this.socket.id}`);
   }
 
-  create() {
+  public create() {
     const { centerX, centerY } = this.cameras.main;
 
     //背景
@@ -66,9 +44,22 @@ export default class Title extends Scene {
     this.events.on('start_lobby', this.startLobby, this);
   }
 
-  startLobby() {
+  private startLobby() {
     this.scene.start(Constant.SCENE.LOBBY, {
       socket: this.socket,
     });
+    this.socket.emit('JoinLobby');
+    this.shutdown();
+    this.scene.stop(Constant.SCENE.TITLE);
+  }
+  private shutdown() {
+    // イベントリスナーの解除
+    this.events.off('start_lobby', this.startLobby, this);
+
+    // アニメーションの停止
+    this.anims.pauseAll();
+
+    // オブジェクトの削除
+    this.children.removeAll(true);
   }
 }
