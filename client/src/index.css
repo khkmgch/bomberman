@@ -1,18 +1,18 @@
 @font-face {
   font-family: 'PressStart2P';
-  src: url('assets/font/PressStart2P-Regular.ttf');
+  src: url('../public/assets/font/PressStart2P-Regular.ttf');
   font-weight: 400;
   font-weight: normal;
 }
 @font-face {
   font-family: 'Ranchers';
-  src: url('assets/font/Ranchers-Regular.ttf');
+  src: url('../public/assets/font/Ranchers-Regular.ttf');
   font-weight: 400;
   font-weight: normal;
 }
 @font-face {
   font-family: 'Bangers';
-  src: url('assets/font/Bangers-Regular.ttf');
+  src: url('../public/assets/font/Bangers-Regular.ttf');
   font-weight: 400;
   font-weight: normal;
 }
