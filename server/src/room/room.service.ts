@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { constants } from 'buffer';
-import { Socket } from 'socket.io';
+import { Inject, Injectable } from '@nestjs/common';
+import { Server, Socket } from 'socket.io';
 import Constant from 'src/constant';
+import { EventsGateway } from 'src/events/events.gateway';
 import { RoomDTO } from 'src/game/dtos/RoomDTO';
 import { UserDTO } from 'src/game/dtos/UserDTO';
+import { Game } from 'src/game/models/Game';
 
 import { Room } from '../game/models/Room';
 import { User } from '../game/models/User';
@@ -16,6 +17,10 @@ export class RoomService {
     setInterval(() => {
       this.removeInactiveRooms();
     }, 10000);
+  }
+
+  public getRoomMap(): Map<string, Room> {
+    return this.roomMap;
   }
 
   //入室可能な全ルームを返す
@@ -127,13 +132,17 @@ export class RoomService {
     //鍵がかかっている場合は、開錠する
     if (
       room.getIsLocked() &&
-      room.getUserMap().size < Constant.MAX_PLAYERS_PER_ROOM
+      room.getUserMap().size < Constant.MAX_PLAYERS_PER_ROOM &&
+      room.getGame() === null
     ) {
       room.setIsLocked(false);
     }
 
     //ユーザーがルームのホストの場合、ルームを削除する
-    if (socket.id === room.getHost().getSocket().id) {
+    if (
+      socket.id === room.getHost().getSocket().id &&
+      room.getGame() === null
+    ) {
       socket.in(roomId).emit('CloseRoomDialog');
       await this.removeRoom(roomId);
     }
@@ -221,6 +230,47 @@ export class RoomService {
     }
   }
 
+  //クライアントがゲーム受信可能になったので、ユーザー状態を更新
+  readyToReceiveGame(socket: Socket) {
+    try {
+      if (socket.roomId !== '') {
+        if (this.userExists(socket.roomId, socket.id)) {
+          const user = this.roomMap
+            .get(socket.roomId)
+            .getUserMap()
+            .get(socket.id);
+          user.setState(Constant.PLAYER_STATE.PLAYING);
+        } else {
+          throw new Error('User not found');
+        }
+      } else {
+        throw new Error('Socket has not roomId');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  //ルーム内の全ユーザーがゲームを受信できるかを確認
+  checkAllPlayersPlaying(socket: Socket): boolean {
+    try {
+      if (socket.roomId !== '') {
+        if (this.roomExists(socket.roomId)) {
+          for (const user of this.roomMap.get(socket.roomId).getUserMap()) {
+            if (user[1].getState() !== Constant.PLAYER_STATE.PLAYING)
+              return false;
+          }
+          return true;
+        } else {
+          throw new Error('Room not found');
+        }
+      } else {
+        throw new Error('Socket has not roomId');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   //ルーム内の全ユーザーの準備が完了しているかを確認
   checkAllPlayersReady(socket: Socket): boolean {
     try {
@@ -247,9 +297,11 @@ export class RoomService {
     try {
       if (roomId !== '') {
         if (this.roomExists(roomId)) {
-          for (const user of this.roomMap.get(roomId).getUserMap()) {
+          const room = this.roomMap.get(roomId);
+          for (const user of room.getUserMap()) {
             user[1].getSocket().leave('lobby');
           }
+          room.setIsLocked(true);
         } else {
           throw new Error('Room not found');
         }
@@ -279,5 +331,46 @@ export class RoomService {
     this.roomMap.forEach((room: Room, roomId: string) => {
       if (room.getUserMap().size <= 0) this.removeRoom(roomId);
     });
+  }
+
+  //プレイヤーを動かす
+  movePlayer(
+    socket: Socket,
+    movement: {
+      up: boolean;
+      right: boolean;
+      down: boolean;
+      left: boolean;
+    },
+  ) {
+    try {
+      if (this.userExists(socket.roomId, socket.id)) {
+        const room: Room = this.getRoomMap().get(socket.roomId);
+        const user: User = room.getUserMap().get(socket.id);
+        const game: Game = room.getGame();
+        if (game) {
+          if (game.getIsAcceptingInput()) {
+            const stage = game.getStage();
+            if (stage) {
+              if (stage.playerExists(user.getId())) {
+                stage.movePlayer(user.getId(), movement);
+              } else {
+                throw new Error('Player not found');
+              }
+            } else {
+              throw new Error('Stage not found');
+            }
+          } else {
+            throw new Error('Input can not be accepted');
+          }
+        } else {
+          throw new Error('Game not found');
+        }
+      } else {
+        throw new Error('User not found');
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 }
