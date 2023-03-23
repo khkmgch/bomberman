@@ -6,11 +6,11 @@ import Constant from '../../../server/src/constant';
 import SceneUtil from '../utils/SceneUtil';
 // import GridTable from 'phaser3-rex-plugins/plugins/gridtable';
 import GridTable from 'phaser3-rex-plugins/templates/ui/gridtable/GridTable';
-import { IRoomDTO } from '../dtos/IRoomDTO';
+import { IRoomDTO } from '../dtos/interface/IRoomDTO';
 import Dialog from 'phaser3-rex-plugins/templates/ui/dialog/Dialog';
 import { Guards } from '../guards/guards';
 import Buttons from 'phaser3-rex-plugins/templates/ui/buttons/Buttons';
-import { IUserDTO } from '../dtos/IUserDTO';
+import { IUserDTO } from '../dtos/interface/IUserDTO';
 import GridSizer from 'phaser3-rex-plugins/templates/ui/gridsizer/GridSizer';
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite';
 
@@ -209,7 +209,7 @@ export default class Lobby extends Scene {
     this.events.off('start_game', this.startGame, this);
 
     // アニメーションの停止
-    this.anims.pauseAll();
+    // this.anims.pauseAll();
 
     // オブジェクトの削除
     this.children.removeAll(true);
