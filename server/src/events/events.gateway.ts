@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -6,8 +6,11 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import { iif } from 'rxjs';
 import { Server, Socket } from 'socket.io';
 import { RoomDTO } from 'src/game/dtos/RoomDTO';
+import { Game } from 'src/game/models/Game';
+import { Room } from 'src/game/models/Room';
 import { RoomService } from 'src/room/room.service';
 
 @Injectable()
@@ -17,7 +20,7 @@ import { RoomService } from 'src/room/room.service';
   },
 })
 export class EventsGateway {
-  constructor(private readonly roomService: RoomService) {}
+  constructor(@Inject(RoomService) public readonly roomService: RoomService) {}
 
   @WebSocketServer()
   server: Server;
@@ -112,16 +115,14 @@ export class EventsGateway {
     @MessageBody() data: { roomId: string },
   ) {
     const user = this.roomService.getUserDTO(socket.id, data.roomId);
-    socket.emit('UpsertUser', { user: user });
-    socket.in(socket.roomId).emit('UpsertUser', { user: user });
+    this.server.in(socket.roomId).emit('UpsertUser', { user: user });
   }
 
   //ゲーム開始の準備
   @SubscribeMessage('ReadyToStartGame')
   readyToStartGame(@ConnectedSocket() socket: Socket): void {
     const user = this.roomService.readyToStartGame(socket);
-    socket.emit('UpsertUser', { user: user });
-    socket.in(socket.roomId).emit('UpsertUser', { user: user });
+    this.server.in(socket.roomId).emit('UpsertUser', { user: user });
   }
 
   //ルーム内の全ユーザーの準備が完了しているかを確認
@@ -135,12 +136,55 @@ export class EventsGateway {
   //ゲームを開始
   @SubscribeMessage('StartGame')
   async startGame(@ConnectedSocket() socket: Socket) {
-    //ロビーから退室させる
-    this.roomService.kickUsersFromLobby(socket.roomId);
+    try {
+      //ロビーから退室させる
+      this.roomService.kickUsersFromLobby(socket.roomId);
 
-    //画面遷移
-    socket.emit('LeaveLobby');
-    socket.in(socket.roomId).emit('LeaveLobby');
-    //await ゲームオブジェクトを作成(RoomServiceとServerを渡す)
+      //ゲームオブジェクトを作成
+      if (!this.roomService.roomExists(socket.roomId)) {
+        throw new Error('Room not found');
+      }
+
+      //ゲームオブジェクトを作成してセット
+      this.roomService
+        .getRoomMap()
+        .get(socket.roomId)
+        .setGame(new Game(this, socket.roomId));
+
+      //画面遷移
+      this.server.in(socket.roomId).emit('LeaveLobby');
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  //クライアントの受信体制が整ったことを受け取る
+  @SubscribeMessage('ReadyToReceiveGame')
+  readyToReceiveGame(@ConnectedSocket() socket: Socket) {
+    this.roomService.readyToReceiveGame(socket);
+
+    if (this.roomService.checkAllPlayersPlaying(socket)) {
+      const game = this.roomService.getRoomMap().get(socket.roomId).getGame();
+      this.server.emit('GetInitialState', game.getStage().getInitialState());
+      setTimeout(() => {
+        game.startCountDown();
+      }, 800);
+    }
+  }
+
+  @SubscribeMessage('movePlayer')
+  movePlayer(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody()
+    data: {
+      movement: {
+        up: boolean;
+        right: boolean;
+        down: boolean;
+        left: boolean;
+      };
+    },
+  ) {
+    this.roomService.movePlayer(socket, data.movement);
   }
 }
