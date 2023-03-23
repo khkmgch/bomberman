@@ -9,6 +9,8 @@ export default class Constant {
   static readonly MAX_PLAYERS_PER_ROOM = 4;
   static readonly USER_KICK_TIMEOUT = 60_000; // 1 minute
 
+  static readonly FRAMERATE = 20;
+
   static readonly PLAYER_STATE = {
     WAITING: 'WAITING',
     READY: 'READY',
@@ -50,6 +52,19 @@ export default class Constant {
     BLACK: 'cat_black',
   };
 
+  static readonly ROCK = ['rock1', 'rock2', 'rock3', 'rock4'];
+
+  static readonly BOX = 'box';
+
+  static readonly FLOWER = {
+    WHITE: 'flower_white',
+    RED: 'flower_red',
+  };
+
+  static readonly GRASS = ['grass1', 'grass2', 'grass3'];
+
+  static readonly WATER = ['water1', 'water2', 'water3', 'water4', 'water5'];
+
   static readonly BACKGROUND = 'background';
 
   static readonly ARROW = {
@@ -90,4 +105,21 @@ export default class Constant {
 
   /* テキスト - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
   static readonly NO_ROOM_TEXT = 'No Rooms ... ';
+
+  /* AIアルゴリズム - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+  static readonly IMPACT_MAP_WEIGHT_COEFFICIENT = {
+    GET_ITEM: {
+      ITEM: 0.5,
+      EXPLOSION: 0.5,
+    },
+    DESTROY_OBSTACLE: {
+      OBSTACLE: 0.5,
+      EXPLOSION: 0.5,
+    },
+    ATTACK_PLAYER: {
+      ITEM: 0.2,
+      PLAYER: 0.3,
+      EXPLOSION: 0.5,
+    },
+  };
 }

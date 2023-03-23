@@ -17,7 +17,7 @@ export default class AnimationUtil {
 
   //猫
   static createCatAnim(anims: Phaser.Animations.AnimationManager) {
-    for (let value of Object.values(Constant.CAT)) {
+    for (const value of Object.values(Constant.CAT)) {
       anims.create({
         key: `${value}-left`,
         frameRate: 10,
@@ -88,5 +88,77 @@ export default class AnimationUtil {
         end: 9,
       }),
     });
+  }
+
+  static createFlowerAnim(anims: Phaser.Animations.AnimationManager) {
+    for (const value of Object.values(Constant.FLOWER)) {
+      anims.create({
+        key: `${value}-anim`,
+        frameRate: 1,
+        repeat: -1,
+        frames: anims.generateFrameNumbers(value, {
+          frames: [0, 5, 10, 15],
+        }),
+      });
+    }
+  }
+  static createGrassAnim(anims: Phaser.Animations.AnimationManager) {
+    for (const value of Constant.GRASS) {
+      anims.create({
+        key: `${value}-anim`,
+        frameRate: 1,
+        repeat: -1,
+        frames: anims.generateFrameNumbers(value, {
+          frames: [0, 5, 10, 15],
+        }),
+      });
+    }
+  }
+  static createWaterAnim(anims: Phaser.Animations.AnimationManager) {
+    for (const value of Constant.WATER) {
+      anims.create({
+        key: `${value}-anim`,
+        frameRate: 5,
+        repeat: -1,
+        frames: anims.generateFrameNumbers(value, {
+          start: 0,
+          end: 7,
+        }),
+      });
+    }
+  }
+  // static setPlayerAnimation(
+  //   sprite: Phaser.GameObjects.Sprite,
+  //   animation: string,
+  //   direction: number
+  // ) {
+  //   if (!sprite.anims.isPlaying) sprite.play(animation);
+  //   else if (sprite.anims.getName() !== animation) sprite.play(animation);
+  //   //左に進むときは右方向の動きを反転させる
+  //   sprite.setFlipX(direction === 3);
+  // }
+  static setCatAnimation(
+    sprite: Phaser.GameObjects.Sprite,
+    animation: string,
+    direction: number
+  ) {
+    if (!sprite.anims.isPlaying) sprite.play(animation);
+    else if (sprite.anims.getName() !== animation) sprite.play(animation);
+    //右方向の場合は左方向の動きを反転させる
+    sprite.setFlipX(direction === 1);
+  }
+
+  static setEdgeObstacleAnim(
+    sprite: Phaser.GameObjects.Sprite,
+    animation: string
+  ) {
+    if (!sprite.anims.isPlaying) sprite.play({ key: animation, repeat: -1 });
+    else if (sprite.anims.getName() !== animation)
+      sprite.play({ key: animation, repeat: -1 });
+  }
+  static setGroundAnim(sprite: Phaser.GameObjects.Sprite, animation: string) {
+    if (!sprite.anims.isPlaying) sprite.play({ key: animation, repeat: -1 });
+    else if (sprite.anims.getName() !== animation)
+      sprite.play({ key: animation, repeat: -1 });
   }
 }

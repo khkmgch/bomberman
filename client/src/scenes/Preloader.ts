@@ -41,29 +41,58 @@ export default class Preloader extends Scene {
     );
 
     //キャラクター
-    for (let value of Object.values(Constant.CHARACTER)) {
+    for (const value of Object.values(Constant.CHARACTER)) {
       this.load.spritesheet(value, `assets/character/${value}.png`, {
         frameWidth,
         frameHeight,
       });
     }
     //猫
-    for (let value of Object.values(Constant.CAT)) {
+    for (const value of Object.values(Constant.CAT)) {
       this.load.spritesheet(value, `assets/character/cat/${value}.png`, {
         frameWidth,
         frameHeight,
       });
     }
     //爆弾と爆風
-    for (let value of Object.values(Constant.ATTACK)) {
+    for (const value of Object.values(Constant.ATTACK)) {
       this.load.spritesheet(value, `assets/attack/${value}.png`, {
         frameWidth,
         frameHeight,
       });
     }
 
+    //花
+    for (const value of Object.values(Constant.FLOWER)) {
+      this.load.spritesheet(value, `assets/map/flower/${value}.png`, {
+        frameWidth,
+        frameHeight,
+      });
+    }
+    //草
+    for (const value of Constant.GRASS) {
+      this.load.spritesheet(value, `assets/map/grass/${value}.png`, {
+        frameWidth,
+        frameHeight,
+      });
+    }
+
+    //箱
+    this.load.image(Constant.BOX, `assets/map/obstacle/${Constant.BOX}.png`);
+    //岩
+    for (const value of Constant.ROCK) {
+      this.load.image(value, `assets/map/obstacle/${value}.png`);
+    }
+    //水
+    for (const value of Constant.WATER) {
+      this.load.spritesheet(value, `assets/map/obstacle/${value}.png`, {
+        frameWidth,
+        frameHeight,
+      });
+    }
+
     //矢印
-    for (let value of Object.values(Constant.ARROW)) {
+    for (const value of Object.values(Constant.ARROW)) {
       this.load.image(value, `assets/ui/arrow/${value}.png`);
     }
 
@@ -81,6 +110,10 @@ export default class Preloader extends Scene {
     AnimationUtil.createCatAnim(this.anims);
     AnimationUtil.createBombAnim(this.anims);
     AnimationUtil.createExplosionAnim(this.anims);
+
+    AnimationUtil.createFlowerAnim(this.anims);
+    AnimationUtil.createGrassAnim(this.anims);
+    AnimationUtil.createWaterAnim(this.anims);
 
     this.scene.start(Constant.SCENE.TITLE, {
       socket: this.socket,
