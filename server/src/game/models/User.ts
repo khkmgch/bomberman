@@ -12,12 +12,12 @@ export class User {
   ) {}
 
   public toDTO(): UserDTO {
-    const dto = new UserDTO();
-    dto.setSocketId(this.getSocket().id);
-    dto.setId(this.getId());
-    dto.setUserName(this.getUserName());
-    dto.setState(this.getState());
-    return dto;
+    return {
+      socketId: this.getSocket().id,
+      id: this.getId(),
+      userName: this.getUserName(),
+      state: this.getState(),
+    };
   }
 
   public getSocket(): Socket {
