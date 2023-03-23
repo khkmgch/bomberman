@@ -1,8 +1,9 @@
 import { User } from './User';
 import { v4 as uuidv4 } from 'uuid';
-import { Game } from 'src/game/Game';
+import { Game } from 'src/game/models/Game';
 import { RoomDTO } from '../dtos/RoomDTO';
 import { UserDTO } from '../dtos/UserDTO';
+import Constant from 'src/constant';
 
 export class Room {
   private id: string = uuidv4();
@@ -14,17 +15,17 @@ export class Room {
   constructor(private host: User) {}
 
   public toDTO(): RoomDTO {
-    const dto = new RoomDTO();
-    dto.setId(this.getId());
-    dto.setHost(this.getHost().toDTO());
-
     let userDTOs: UserDTO[] = [];
     for (let user of this.getUserMap()) {
       userDTOs.push(user[1].toDTO());
     }
-    dto.setUsers(userDTOs);
-    dto.setNumUsers(userDTOs.length);
-    return dto;
+    return {
+      id: this.getId(),
+      host: this.getHost().toDTO(),
+      users: userDTOs,
+      numUsers: userDTOs.length,
+      maxUsers: Constant.MAX_PLAYERS_PER_ROOM,
+    };
   }
   public getId(): string {
     return this.id;

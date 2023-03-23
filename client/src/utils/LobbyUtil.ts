@@ -3,7 +3,7 @@ import GridTable from 'phaser3-rex-plugins/plugins/gridtable';
 // import GridTable from 'phaser3-rex-plugins/templates/ui/gridtable/GridTable';
 import Label from 'phaser3-rex-plugins/templates/ui/label/Label';
 import Constant from '../../../server/src/constant';
-import { IRoomDTO } from '../dtos/IRoomDTO';
+import { IRoomDTO } from '../dtos/interface/IRoomDTO';
 import Lobby from '../scenes/Lobby';
 
 export default class LobbyUtil {
