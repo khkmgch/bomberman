@@ -57,7 +57,7 @@ export default class Title extends Scene {
     this.events.off('start_lobby', this.startLobby, this);
 
     // アニメーションの停止
-    this.anims.pauseAll();
+    // this.anims.pauseAll();
 
     // オブジェクトの削除
     this.children.removeAll(true);
