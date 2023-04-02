@@ -163,16 +163,19 @@ export class EventsGateway {
   readyToReceiveGame(@ConnectedSocket() socket: Socket) {
     this.roomService.readyToReceiveGame(socket);
 
-    if (this.roomService.checkAllPlayersPlaying(socket)) {
-      const game = this.roomService.getRoomMap().get(socket.roomId).getGame();
-      this.server.emit('GetInitialState', game.getStage().getInitialState());
-      setTimeout(() => {
-        game.startCountDown();
-      }, 800);
-    }
+    let interval = setInterval(() => {
+      if (this.roomService.checkAllPlayersPlaying(socket)) {
+        const game = this.roomService.getRoomMap().get(socket.roomId).getGame();
+        this.server.emit('GetInitialState', game.getStage().getInitialState());
+        setTimeout(() => {
+          game.startCountDown();
+        }, 800);
+        clearInterval(interval);
+      }
+    }, 500);
   }
 
-  @SubscribeMessage('movePlayer')
+  @SubscribeMessage('MovePlayer')
   movePlayer(
     @ConnectedSocket() socket: Socket,
     @MessageBody()
@@ -186,5 +189,10 @@ export class EventsGateway {
     },
   ) {
     this.roomService.movePlayer(socket, data.movement);
+  }
+
+  @SubscribeMessage('PutBomb')
+  putBomb(@ConnectedSocket() socket: Socket) {
+    this.roomService.putBomb(socket);
   }
 }
