@@ -5,13 +5,15 @@ import { Movement } from 'src/game/types/Movement';
 import { Position } from 'src/game/types/Position';
 import { Velocity } from 'src/game/types/Velocity';
 import { StageUtil } from 'src/game/utils/StageUtil';
-import { BreakableObstacle } from './BreakableObstacle';
-import { Chatacter } from './Character';
-import { EdgeObstacle } from './EdgeObstacle';
-import { FixedObstacle } from './FixedObstacle';
-import { GameObject } from './GameObject';
+import { Bomb } from '../attack/Bomb';
+import { BreakableObstacle } from '../map/obstacle/BreakableObstacle';
+import { Character } from './Character';
+import { EdgeObstacle } from '../map/obstacle/EdgeObstacle';
+import { FixedObstacle } from '../map/obstacle/FixedObstacle';
+import { Cell } from 'src/game/types/Cell';
+import { Item } from '../item/Item';
 
-export class Player extends Chatacter {
+export class Player extends Character {
   private movement: Movement = {
     up: false,
     right: false,
@@ -25,8 +27,9 @@ export class Player extends Chatacter {
     name: string,
     x: number,
     y: number,
+    stage: IStage,
   ) {
-    super(id, name, x, y);
+    super(id, name, x, y, stage);
   }
 
   /* getter - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -67,34 +70,88 @@ export class Player extends Chatacter {
     // movementによって、プレイヤーの向きと位置を更新
     if (this.movement.up) {
       this.setDirection(0);
-      this.setVelocity(0, -this.speed);
+      this.setVelocity(0, -this.ability.speed);
       this.animWalkUp();
     }
     if (this.movement.right) {
       this.setDirection(1);
-      this.setVelocity(this.speed, 0);
+      this.setVelocity(this.ability.speed, 0);
       this.animWalkLeft();
     }
     if (this.movement.down) {
       this.setDirection(2);
-      this.setVelocity(0, this.speed);
+      this.setVelocity(0, this.ability.speed);
       this.animWalkDown();
     }
     if (this.movement.left) {
       this.setDirection(3);
-      this.setVelocity(-this.speed, 0);
+      this.setVelocity(-this.ability.speed, 0);
       this.animWalkLeft();
     }
 
     if (this.canMove(stage.getMap(), deltaTime)) {
       this.move(deltaTime);
     }
+    if (this.overlapWithExplosion(stage.getMap())) {
+      this.takeDamage();
+    }
+    const item: Item = this.overlapWithItem(stage.getMap());
+
+    if (item) {
+      item.doEffect(this);
+      item.removeItem(stage);
+      this.emitSyncItems();
+    }
+  }
+  private emitSyncItems(): void {
+    this.socket.emit('SyncItems', {
+      items: this.item,
+    });
   }
 
-  private canMove(map: GameObject[][], deltaTime: number): boolean {
-    return !this.collideWithObject(map, deltaTime);
+  private canMove(map: Cell[][], deltaTime: number): boolean {
+    return (
+      !this.collideWithBomb(map, deltaTime) &&
+      !this.collideWithObstacle(map, deltaTime)
+    );
   }
-  private collideWithObject(map: GameObject[][], deltaTime: number): boolean {
+  //障害物との当たり判定
+  private collideWithObstacle(map: Cell[][], deltaTime: number): boolean {
+    const cell: Cell = this.getNextCell(map, deltaTime);
+    return (
+      cell.entity instanceof EdgeObstacle ||
+      cell.entity instanceof FixedObstacle ||
+      cell.entity instanceof BreakableObstacle
+    );
+  }
+  //Bombとの当たり判定
+  private collideWithBomb(map: Cell[][], deltaTime: number): boolean {
+    //現在のマスのインデックス
+    const { i: currI, j: currJ }: Index = this.getIndex();
+    //現在のマス
+    const currCell: Cell = map[currI][currJ];
+    if (currCell.entity === null || currCell.entity === undefined) {
+      const nextCell: Cell = this.getNextCell(map, deltaTime);
+      return nextCell.entity instanceof Bomb;
+    } else if (currCell.entity instanceof Bomb) {
+      //Bombと同じマスにいる場合
+
+      const { i: nextI, j: nextJ }: Index = this.getNextIndex(deltaTime);
+      //移動先の座標のインデックスが現在のインデックスと同じ場合
+      if (nextI === currI && nextJ === currJ) return false;
+
+      const nextCell: Cell = map[nextI][nextJ];
+      if (nextCell.entity instanceof Bomb) return true;
+      else return false;
+    } else return false;
+  }
+  //移動先のマスを返すメソッド
+  private getNextCell(map: Cell[][], deltaTime: number): Cell {
+    const { i, j }: Index = this.getNextIndex(deltaTime);
+    return map[i][j];
+  }
+  //移動先の位置のインデックスを返すメソッド
+  private getNextIndex(deltaTime: number): Index {
     let { x: nextX, y: nextY }: Position = this.getPosition();
     const { x: vX, y: vY }: Velocity = this.velocity;
     switch (this.direction) {
@@ -115,45 +172,6 @@ export class Player extends Chatacter {
         nextY += this.size / 2;
         break;
     }
-    const { i, j }: Index = StageUtil.getMapIndex(nextX, nextY);
-    const object: GameObject = map[i][j];
-    return (
-      object instanceof EdgeObstacle ||
-      object instanceof FixedObstacle ||
-      object instanceof BreakableObstacle
-    );
+    return StageUtil.getMapIndex(nextX, nextY);
   }
-  // let boundX: number = this.x;
-  //   let boundY: number = this.y;
-  //   let i: number;
-  //   let j: number;
-  //   let stageValue: number;
-
-  //   if (this.direction === "up") {
-  //     boundY -= this.speed;
-  //     i = Math.floor(boundY / Stage.boxSize);
-  //     j = Math.floor((boundX + this.size / 2) / Stage.boxSize);
-  //     stageValue = board[i][j];
-  //   } else if (this.direction === "down") {
-  //     boundY += this.speed + this.size;
-  //     i = Math.floor(boundY / Stage.boxSize);
-  //     j = Math.floor((boundX + this.size / 2) / Stage.boxSize);
-  //     stageValue = board[i][j];
-  //   } else if (this.direction === "left") {
-  //     boundX -= this.speed;
-  //     i = Math.floor((boundY + this.size / 2) / Stage.boxSize);
-  //     j = Math.floor(boundX / Stage.boxSize);
-  //     stageValue = board[i][j];
-  //   } else if (this.direction === "right") {
-  //     boundX += this.speed + this.size;
-  //     i = Math.floor((boundY + this.size / 2) / Stage.boxSize);
-  //     j = Math.floor(boundX / Stage.boxSize);
-  //     stageValue = board[i][j];
-  //   }
-  //   return (
-  //     stageValue === Stage.stageValues.stone ||
-  //     stageValue === Stage.stageValues.wall ||
-  //     stageValue === Stage.stageValues.bomb
-  //     //&& !this.isOnTheBomb(board))
-  //   );
 }
