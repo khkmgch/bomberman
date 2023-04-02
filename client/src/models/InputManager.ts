@@ -13,7 +13,7 @@ export class InputManager {
 
   update() {
     if (Phaser.Input.Keyboard.JustDown(this.keyboard.space)) {
-      this.socket.emit('putBomb');
+      this.socket.emit('PutBomb');
     }
 
     if (
@@ -59,7 +59,7 @@ export class InputManager {
         arrowInput.down = true;
       }
 
-      this.socket.emit('movePlayer', { movement: arrowInput });
+      this.socket.emit('MovePlayer', { movement: arrowInput });
     }
 
     this.prevNone = this.none;
