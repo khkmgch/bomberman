@@ -1,19 +1,27 @@
 import Constant from '../../../server/src/constant';
+import { IBombDTO } from '../dtos/interface/IBombDTO';
 import { IBreakableObstacleDTO } from '../dtos/interface/IBreakableObstacleDTO';
 import { ICharacterDTO } from '../dtos/interface/ICharacterDTO';
 import { IEdgeObstacleDTO } from '../dtos/interface/IEdgeObstacleDTO';
+import { IExplosionDTO } from '../dtos/interface/IExplosionDTO';
 import { IFixedObstacleDTO } from '../dtos/interface/IFixedObstacleDTO';
 import { IGroundDTO } from '../dtos/interface/IGroundDTO';
+import { IItemDTO } from '../dtos/interface/IItemDTO';
+import { IMarkerDTO } from '../dtos/interface/IMarkerDTO';
+import { IBomb } from '../interfaces/IBomb';
 import { IBreakableObstacle } from '../interfaces/IBreakableObstacle';
 import { ICharacter } from '../interfaces/ICharacter';
 import { IEdgeObstacle } from '../interfaces/IEdgeObstacle';
+import { IExplosion } from '../interfaces/IExplosion';
 import { IFixedObstacle } from '../interfaces/IFixedObstacle';
 import { IGround } from '../interfaces/IGround';
+import { IItem } from '../interfaces/IItem';
+import { IMarker } from '../interfaces/IMarker';
 import Game from '../scenes/Game';
 import AnimationUtil from './AnimationUtil';
 
 export class SyncUtil {
-  static setGrounds(groundArr: IGroundDTO[], scene: Game) {
+  static addGrounds(groundArr: IGroundDTO[], scene: Game) {
     if (groundArr && groundArr.length > 0) {
       const groundMap: Map<number, IGround> = scene.getObjects().groundMap;
       groundArr.forEach((ground) => {
@@ -37,7 +45,7 @@ export class SyncUtil {
       });
     }
   }
-  static setEdgeObstacles(edgeObstacleArr: IEdgeObstacleDTO[], scene: Game) {
+  static addEdgeObstacles(edgeObstacleArr: IEdgeObstacleDTO[], scene: Game) {
     if (edgeObstacleArr && edgeObstacleArr.length > 0) {
       const edgeObstacleMap: Map<number, IEdgeObstacle> =
         scene.getObjects().edgeObstacleMap;
@@ -64,7 +72,7 @@ export class SyncUtil {
       });
     }
   }
-  static setFixedObstacles(fixedObstacleArr: IFixedObstacleDTO[], scene: Game) {
+  static addFixedObstacles(fixedObstacleArr: IFixedObstacleDTO[], scene: Game) {
     if (fixedObstacleArr && fixedObstacleArr.length > 0) {
       const fixedObstacleMap: Map<number, IFixedObstacle> =
         scene.getObjects().fixedObstacleMap;
@@ -88,7 +96,7 @@ export class SyncUtil {
       });
     }
   }
-  static setBreakableObstacles(
+  static addBreakableObstacles(
     breakableObstacleArr: IBreakableObstacleDTO[],
     scene: Game
   ) {
@@ -120,16 +128,160 @@ export class SyncUtil {
     }
   }
 
-  static setCharacters(characterArr: ICharacterDTO[], scene: Game) {
+  static addBomb(bomb: IBombDTO, scene: Game) {
+    if (!bomb) return;
+
+    const bombMap: Map<number, IBomb> = scene.getObjects().bombMap;
+    if (bombMap.has(bomb.id)) return;
+
+    const sprite = scene.add
+      .sprite(bomb.x + bomb.size / 2, bomb.y + bomb.size / 2, bomb.spriteKey)
+      .setScale(0.6)
+      .setOrigin(0.5)
+      .setDepth(2);
+
+    AnimationUtil.setBombAnim(sprite, bomb.animation);
+
+    bombMap.set(bomb.id, {
+      sprite: sprite,
+      sync: null,
+    });
+  }
+  static removeBomb(id: number, scene: Game) {
+    const bombMap: Map<number, IBomb> = scene.getObjects().bombMap;
+    if (!bombMap.has(id)) return;
+
+    const bomb: IBomb = bombMap.get(id) as IBomb;
+    bomb.sprite.destroy();
+    bomb.sync = null;
+
+    bombMap.delete(id);
+  }
+  static removeRemoveBreakableObstacle(id: number, scene: Game) {
+    const breakableObstacleMap: Map<number, IBreakableObstacle> =
+      scene.getObjects().breakableObstacleMap;
+    if (!breakableObstacleMap.has(id)) return;
+
+    const breakableObstacle: IBreakableObstacle = breakableObstacleMap.get(
+      id
+    ) as IBreakableObstacle;
+    breakableObstacle.sprite.destroy();
+    breakableObstacle.sync = null;
+
+    breakableObstacleMap.delete(id);
+  }
+  static addItem(item: IItemDTO, scene: Game) {
+    if (!item) return;
+
+    const itemMap: Map<number, IItem> = scene.getObjects().itemMap;
+    if (itemMap.has(item.id)) return;
+
+    const sprite = scene.add
+      .sprite(item.x + item.size / 2, item.y + item.size / 2, item.spriteKey)
+      .setScale(0.8)
+      .setOrigin(0.5);
+
+    itemMap.set(item.id, {
+      sprite: sprite,
+      sync: null,
+    });
+  }
+  static removeItem(id: number, scene: Game) {
+    const itemMap: Map<number, IItem> = scene.getObjects().itemMap;
+    if (!itemMap.has(id)) return;
+
+    const item: IItem = itemMap.get(id) as IItem;
+    item.sprite.destroy();
+    item.sync = null;
+
+    itemMap.delete(id);
+  }
+
+  static addMarkers(markerArr: IMarkerDTO[], scene: Game) {
+    if (markerArr && markerArr.length > 0) {
+      const markerMap: Map<number, IMarker> = scene.getObjects().markerMap;
+      markerArr.forEach((marker: IMarkerDTO) => {
+        if (!markerMap.has(marker.id)) {
+          const sprite = scene.add
+            .sprite(
+              marker.x + marker.size / 2,
+              marker.y + marker.size / 2,
+              marker.spriteKey
+            )
+            .setScale(0.6)
+            .setOrigin(0.5)
+            .setDepth(0);
+          markerMap.set(marker.id, {
+            sprite: sprite,
+            sync: null,
+          });
+        }
+      });
+    }
+  }
+  static removeMarkers(idArr: number[], scene: Game) {
+    if (idArr && idArr.length > 0) {
+      const markerMap: Map<number, IMarker> = scene.getObjects().markerMap;
+      idArr.forEach((id: number) => {
+        if (markerMap.has(id)) {
+          const marker: IMarker = markerMap.get(id) as IMarker;
+          marker.sprite.destroy();
+          marker.sync = null;
+
+          markerMap.delete(id);
+        }
+      });
+    }
+  }
+  static addExplosions(explosionArr: IExplosionDTO[], scene: Game) {
+    if (explosionArr && explosionArr.length > 0) {
+      const explosionMap: Map<number, IExplosion> =
+        scene.getObjects().explosionMap;
+      explosionArr.forEach((explosion: IExplosionDTO) => {
+        if (!explosionMap.has(explosion.id)) {
+          const sprite: Phaser.GameObjects.Sprite = scene.add
+            .sprite(explosion.x, explosion.y, explosion.spriteKey)
+            .setScale(1.0)
+            .setOrigin(0)
+            .setDepth(2);
+
+          AnimationUtil.setExplosionAnim(sprite, explosion.animation);
+
+          explosionMap.set(explosion.id, {
+            sprite: sprite,
+            sync: null,
+          });
+        }
+      });
+    }
+  }
+  static removeExplosions(idArr: number[], scene: Game) {
+    if (idArr && idArr.length > 0) {
+      const explosionMap: Map<number, IExplosion> =
+        scene.getObjects().explosionMap;
+      idArr.forEach((id: number) => {
+        if (explosionMap.has(id)) {
+          const explosion: IExplosion = explosionMap.get(id) as IExplosion;
+          explosion.sprite.destroy();
+          explosion.sync = null;
+
+          explosionMap.delete(id);
+        }
+      });
+    }
+  }
+
+  static addCharacters(characterArr: ICharacterDTO[], scene: Game) {
     if (characterArr && characterArr.length > 0) {
       const characterMap: Map<number, ICharacter> =
         scene.getObjects().characterMap;
-      characterArr.forEach((character) => {
+      characterArr.forEach((character: ICharacterDTO) => {
         if (!characterMap.has(character.id)) {
           const sprite = scene.add
             .sprite(character.x, character.y, character.spriteKey)
             .setScale(1.0)
-            .setOrigin(0);
+            .setOrigin(0)
+            .setDepth(3);
 
           const {
             leftGauge,
@@ -158,6 +310,7 @@ export class SyncUtil {
       });
     }
   }
+
   static createNameText(
     character: ICharacterDTO,
     scene: Game
@@ -206,38 +359,6 @@ export class SyncUtil {
     return { leftGauge, rightGauge };
   }
 
-  // static setCharacters(characterArr: ICharacterDTO[], scene: Game) {
-  //   if (characterArr && characterArr.length > 0) {
-  //     characterArr.forEach((character) => {
-  //       if (!scene.getObjects().characterMap[character.id]) {
-  //         const sprite = scene.add
-  //           .sprite(character.x, character.y, character.spriteKey)
-  //           .setScale(1.0)
-  //           .setOrigin(0);
-
-  //         const {
-  //           leftGauge,
-  //           rightGauge,
-  //         }: {
-  //           leftGauge: Phaser.GameObjects.Graphics;
-  //           rightGauge: Phaser.GameObjects.Graphics;
-  //         } = SyncUtil.createLifeGauge(character, scene);
-
-  //         const nameText = SyncUtil.createNameText(character, scene);
-
-  //         scene.getObjects().characterMap[character.id] = {
-  //           sprite: sprite,
-  //           leftGauge: leftGauge,
-  //           rightGauge: rightGauge,
-  //           nameText: nameText,
-  //           sync: null,
-  //         };
-  //       }
-  //       scene.getObjects().characterMap[character.id].sync = character;
-  //     });
-  //   }
-  // }
-
   static updateCharacter(scene: Game) {
     //syncのデータを基に、spriteの座標とアニメーションを更新
     const characterMap: Map<number, ICharacter> =
@@ -261,7 +382,7 @@ export class SyncUtil {
         character.rightGauge = lifeGauge.rightGauge;
 
         //アニメーションを更新
-        AnimationUtil.setCatAnimation(
+        AnimationUtil.setCatAnim(
           character.sprite,
           character.sync.animation,
           character.sync.direction
@@ -269,4 +390,46 @@ export class SyncUtil {
       });
     }
   }
+  static flashCharacter(id: number, scene: Game) {
+    const characterMap: Map<number, ICharacter> =
+      scene.getObjects().characterMap;
+    if (!characterMap.has(id)) return;
+
+    const character: ICharacter = characterMap.get(id) as ICharacter;
+
+    const duration: number = Constant.INVINCIBLE_DURATION;
+    const interval: number = 250;
+    const repeat: number = duration / interval / 2;
+
+    scene.tweens.timeline({
+      tweens: [
+        {
+          targets: character.sprite,
+          alpha: 0.5,
+          duration: interval,
+        },
+        {
+          targets: character.sprite,
+          alpha: 1,
+          duration: interval,
+        },
+      ],
+      repeat: repeat,
+    });
+  }
+  static removeCharacter(id: number, scene: Game) {
+    const characterMap: Map<number, ICharacter> =
+      scene.getObjects().characterMap;
+    if (!characterMap.has(id)) return;
+
+    const character: ICharacter = characterMap.get(id) as ICharacter;
+    character.sprite.destroy();
+    character.nameText.destroy();
+    character.leftGauge.destroy();
+    character.rightGauge.destroy();
+    character.sync = null;
+
+    characterMap.delete(id);
+  }
+  
 }
