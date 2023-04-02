@@ -24,6 +24,7 @@ import { InputManager } from '../models/InputManager';
 import { Objects } from '../types/Objects';
 import { GameUtil } from '../utils/GameUtil';
 import { SyncUtil } from '../utils/SyncUtil';
+import { ISyncItemsDTO } from '../dtos/interface/ISyncItemsDTO';
 
 export default class Game extends Scene {
   private centerX: number;
@@ -130,6 +131,7 @@ export default class Game extends Scene {
     this.onRemoveItem();
     this.onDamaged();
     this.onDead();
+    this.onSyncItems();
   }
   private removeSocketListeners(): void {}
 
@@ -143,7 +145,6 @@ export default class Game extends Scene {
         breakableObstacleArr: IBreakableObstacleDTO[];
         characterArr: ICharacterDTO[];
       }) => {
-        console.log(data);
         try {
           if (Guards.isGetInitialStateDTO(data)) {
             SyncUtil.addGrounds(data.groundArr, this);
@@ -168,13 +169,23 @@ export default class Game extends Scene {
   }
   private onSyncTime(): void {
     this.socket.on('SyncTime', (data: { timeStr: string }) => {
-      this.header.timeText?.setText(data.timeStr);
+      try {
+        if (Guards.isSyncTimeDTO(data)) {
+          this.header.timeText?.setText(data.timeStr);
+        } else throw new Error('Invalid data format');
+      } catch (error) {
+        console.error(error);
+      }
     });
   }
   private onAddBomb(): void {
     this.socket.on('AddBomb', (data: { bomb: IBombDTO }) => {
       try {
-        SyncUtil.addBomb(data.bomb, this);
+        if (Guards.isAddBombDTO(data)) {
+          SyncUtil.addBomb(data.bomb, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
       } catch (error) {
         console.error(error);
       }
@@ -183,7 +194,11 @@ export default class Game extends Scene {
   private onRemoveBomb(): void {
     this.socket.on('RemoveBomb', (data: { id: number }) => {
       try {
-        SyncUtil.removeBomb(data.id, this);
+        if (Guards.isRemoveBombDTO(data)) {
+          SyncUtil.removeBomb(data.id, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
       } catch (error) {
         console.error(error);
       }
@@ -192,7 +207,11 @@ export default class Game extends Scene {
   private onAddMarkers(): void {
     this.socket.on('AddMarkers', (data: { markerArr: IMarkerDTO[] }) => {
       try {
-        SyncUtil.addMarkers(data.markerArr, this);
+        if (Guards.isAddMarkersDTO(data)) {
+          SyncUtil.addMarkers(data.markerArr, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
       } catch (error) {
         console.error(error);
       }
@@ -201,7 +220,11 @@ export default class Game extends Scene {
   private onRemoveMarkers(): void {
     this.socket.on('RemoveMarkers', (data: { idArr: number[] }) => {
       try {
-        SyncUtil.removeMarkers(data.idArr, this);
+        if (Guards.isRemoveMarkersDTO(data)) {
+          SyncUtil.removeMarkers(data.idArr, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
       } catch (error) {
         console.error(error);
       }
@@ -212,7 +235,11 @@ export default class Game extends Scene {
       'AddExplosions',
       (data: { explosionArr: IExplosionDTO[] }) => {
         try {
-          SyncUtil.addExplosions(data.explosionArr, this);
+          if (Guards.isAddExplosionsDTO(data)) {
+            SyncUtil.addExplosions(data.explosionArr, this);
+          } else {
+            throw new Error('Invalid data format');
+          }
         } catch (error) {
           console.error(error);
         }
@@ -222,7 +249,11 @@ export default class Game extends Scene {
   private onRemoveExplosions(): void {
     this.socket.on('RemoveExplosions', (data: { idArr: number[] }) => {
       try {
-        SyncUtil.removeExplosions(data.idArr, this);
+        if (Guards.isRemoveExplosionsDTO(data)) {
+          SyncUtil.removeExplosions(data.idArr, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
       } catch (error) {
         console.error(error);
       }
@@ -231,7 +262,11 @@ export default class Game extends Scene {
   private onRemoveBreakableObstacle(): void {
     this.socket.on('RemoveBreakableObstacle', (data: { id: number }) => {
       try {
-        SyncUtil.removeRemoveBreakableObstacle(data.id, this);
+        if (Guards.isRemoveBreakableObstacleDTO(data)) {
+          SyncUtil.removeRemoveBreakableObstacle(data.id, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
       } catch (error) {
         console.error(error);
       }
@@ -240,7 +275,11 @@ export default class Game extends Scene {
   private onAddItem(): void {
     this.socket.on('AddItem', (data: { item: IItemDTO }) => {
       try {
-        SyncUtil.addItem(data.item, this);
+        if (Guards.isAddItemDTO(data)) {
+          SyncUtil.addItem(data.item, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
       } catch (error) {
         console.error(error);
       }
@@ -249,7 +288,11 @@ export default class Game extends Scene {
   private onRemoveItem(): void {
     this.socket.on('RemoveItem', (data: { id: number }) => {
       try {
-        SyncUtil.removeItem(data.id, this);
+        if (Guards.isRemoveItemDTO(data)) {
+          SyncUtil.removeItem(data.id, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
       } catch (error) {
         console.error(error);
       }
@@ -258,7 +301,11 @@ export default class Game extends Scene {
   private onDamaged(): void {
     this.socket.on('Damaged', (data: { id: number }) => {
       try {
-        SyncUtil.flashCharacter(data.id, this);
+        if (Guards.isDamagedDTO(data)) {
+          SyncUtil.flashCharacter(data.id, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
       } catch (error) {
         console.error(error);
       }
@@ -267,7 +314,26 @@ export default class Game extends Scene {
   private onDead(): void {
     this.socket.on('Dead', (data: { id: number }) => {
       try {
-        SyncUtil.removeCharacter(data.id, this);
+        if (Guards.isDeadDTO(data)) {
+          SyncUtil.removeCharacter(data.id, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  }
+  private onSyncItems(): void {
+    this.socket.on('SyncItems', (data: { items: ISyncItemsDTO }) => {
+      try {
+        if (Guards.isSyncItemsDTO(data)) {
+          this.header.bombUpText?.setText(`× ${data.items.bombUp}`);
+          this.header.fireUpText?.setText(`× ${data.items.fireUp}`);
+          this.header.speedUpText?.setText(`× ${data.items.speedUp}`);
+        } else {
+          throw new Error('Invalid data format');
+        }
       } catch (error) {
         console.error(error);
       }
@@ -275,7 +341,20 @@ export default class Game extends Scene {
   }
   private onCountDown(): void {
     this.socket.on('CountDown', (data: { countDown: number }) => {
-      GameUtil.setCountDown(data.countDown, this, this.centerX, this.centerY);
+      try {
+        if (Guards.isCountDownDTO(data)) {
+          GameUtil.setCountDown(
+            data.countDown,
+            this,
+            this.centerX,
+            this.centerY
+          );
+        } else {
+          throw new Error('Invalid data format');
+        }
+      } catch (error) {
+        console.error(error);
+      }
     });
   }
 }
