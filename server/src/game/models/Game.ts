@@ -8,7 +8,10 @@ export class Game {
   private stageFactory: IStageFactory;
   private stage: IStage;
   private time: number;
+  private startTime: number;
   private isAcceptingInput: boolean = false;
+  private shouldUpdate: boolean = true;
+  private elapsedSeconds: number;
 
   constructor(private eventsGateway: EventsGateway, private roomId: string) {
     this.setStageFactory(new GrassStageFactory(eventsGateway, roomId));
@@ -33,7 +36,7 @@ export class Game {
     this.stage = stage;
   }
 
-  /* others- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+  /* others - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
   public startCountDown() {
     const countDown: number[] = [3, 2, 1];
@@ -52,6 +55,7 @@ export class Game {
           .emit('CountDown', { countDown: 0 });
 
         this.isAcceptingInput = true;
+        this.startTime = Date.now();
         this.time = Date.now();
         this.update();
 
@@ -61,16 +65,32 @@ export class Game {
   }
 
   public update(): void {
-    let interval = setInterval(() => {
+    let interval: NodeJS.Timer = setInterval(() => {
+      if (!this.shouldUpdate) {
+        clearInterval(interval);
+      }
+
+      if (this.stage === null) return;
       //経過時間の算出
 
       //ミリ秒
-      const currTime = Date.now();
+      const currTime: number = Date.now();
       //秒
-      const deltaTime = (currTime - this.time) * 0.001;
+      const deltaTime: number = (currTime - this.time) * 0.001;
       this.time = currTime;
 
       this.stage.update(deltaTime);
+
+      // 経過時間を秒単位で計算する
+      const elapsedSeconds: number = Math.floor(
+        (this.time - this.startTime) / 1000,
+      );
+      if (elapsedSeconds !== this.elapsedSeconds) {
+        this.elapsedSeconds = elapsedSeconds;
+        this.eventsGateway.server
+          .in(this.roomId)
+          .emit('SyncTime', { timeStr: this.getElapsedTimeStr() });
+      }
 
       this.eventsGateway.server
         .in(this.roomId)
@@ -78,36 +98,23 @@ export class Game {
     }, 1000 / Constant.FRAMERATE);
   }
 
-  // public update() {
-  //   // 周期的処理（1秒間にFRAMERATE回の場合、delayは、1000[ms]/FRAMERATE[回]）
-  //   let timerId = setInterval(() => {
-  //     // 経過時間の算出
-  //     const currTime = Date.now(); // ミリ秒単位で取得
-  //     const deltaTime = (currTime - this.time) * 0.001; // 秒に変換
-  //     this.time = currTime;
-  //     //console.log( 'DeltaTime = %f[s]', fDeltaTime );
-  //     // 処理時間計測用
-  //     // const hrtime = process.hrtime(); // ナノ秒単位で取得
-  //     // ゲームステージの更新
-  //     this.stage.update(deltaTime);
-  //     // const hrtimeDiff = process.hrtime(hrtime);
-  //     // const nanoSecDiff =
-  //     //   hrtimeDiff[0] * 1e9 + hrtimeDiff[1];
-  //     const time = (currTime - this.startTime) * 0.001;
-  //     //ルーム内のユーザーにデータを送信
-  //     this.roomManager.ioNspGame.in(this.roomId).emit('syncGame', {
-  //       time: time,
-  //       playerArr: this.stage.playerList.toArray(),
-  //       npcArr: this.stage.npcList.toArray(),
-  //       bombArr: this.stage.bombList.toArray(),
-  //       explosionArr: this.stage.explosionList.toArray(),
-  //       itemArr: this.stage.itemList.toArray(),
-  //     });
+  public offUpdate(): void {
+    this.shouldUpdate = false;
+  }
+  private getElapsedTimeStr(): string {
+    // 経過時間を秒単位で計算する
+    const elapsedSeconds: number = this.elapsedSeconds;
 
-  //     if (time >= 180) {
-  //       clearInterval(timerId);
-  //       this.roomManager.ioNspGame.in(this.roomId).emit('timeUp');
-  //     }
-  //   }, 1000 / ServerConfig.FRAMERATE); // 単位は[ms]。1000[ms] / FRAMERATE[回]
-  // }
+    // 分単位と秒単位に変換する
+    const minutes: number = Math.floor(elapsedSeconds / 60);
+    const seconds: number = elapsedSeconds % 60;
+
+    // 2桁の0埋めで表記を整える
+    const minutesStr: string = minutes.toString().padStart(2, '0');
+    const secondsStr: string = seconds.toString().padStart(2, '0');
+
+    // フォーマットを合わせて経過時間を表記する
+    const elapsedTimeStr: string = `${minutesStr}:${secondsStr}`;
+    return elapsedTimeStr;
+  }
 }
