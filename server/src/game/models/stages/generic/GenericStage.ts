@@ -8,20 +8,25 @@ import { GroundDTO } from 'src/game/dtos/GroundDTO';
 import { IStage } from 'src/game/interfaces/stage/IStage';
 import { Movement } from 'src/game/types/Movement';
 import { Position } from 'src/game/types/Position';
+import { BombManager } from '../../managers/BombManager';
 import { BreakableObstacleManager } from '../../managers/BreakableObstacleManager';
 import { EdgeObstacleManager } from '../../managers/EdgeObstacleManager';
+import { ExplosionManager } from '../../managers/ExplosionManager';
 import { FixedObstacleManager } from '../../managers/FixedObstacleManager';
 import { GroundManager } from '../../managers/GroundManager';
+import { MarkerManager } from '../../managers/MarkerManager';
 import { GameObject } from '../../objects/GameObject';
-import { Npc } from '../../objects/Npc';
-import { Player } from '../../objects/Player';
+import { Npc } from '../../objects/character/Npc';
+import { Player } from '../../objects/character/Player';
+import { ItemManager } from '../../managers/ItemManager';
+import { Cell } from 'src/game/types/Cell';
 
 // ステージの汎用クラス
 export class GenericStage implements IStage {
   protected tileSize: number;
   protected rows: number;
   protected cols: number;
-  protected map: GameObject[][];
+  protected map: Cell[][];
   protected groundManager: GroundManager = new GroundManager();
   protected edgeObstacleManager: EdgeObstacleManager =
     new EdgeObstacleManager();
@@ -31,6 +36,10 @@ export class GenericStage implements IStage {
     new BreakableObstacleManager();
   protected playerMap: Map<number, Player> = new Map<number, Player>();
   protected npcMap: Map<number, Npc> = new Map<number, Npc>();
+  protected bombManager: BombManager = new BombManager();
+  protected markerManager: MarkerManager = new MarkerManager();
+  protected explosionManager: ExplosionManager = new ExplosionManager();
+  protected itemManager: ItemManager = new ItemManager();
 
   constructor(
     protected type: string,
@@ -60,7 +69,7 @@ export class GenericStage implements IStage {
   public getCols(): number {
     return this.cols;
   }
-  public getMap(): GameObject[][] {
+  public getMap(): Cell[][] {
     return this.map;
   }
 
@@ -81,6 +90,18 @@ export class GenericStage implements IStage {
   }
   public getNpcMap(): Map<number, Npc> {
     return this.npcMap;
+  }
+  public getBombManager(): BombManager {
+    return this.bombManager;
+  }
+  public getMarkerManager(): MarkerManager {
+    return this.markerManager;
+  }
+  public getExplosionManager(): ExplosionManager {
+    return this.explosionManager;
+  }
+  public getItemManager(): ItemManager {
+    return this.itemManager;
   }
 
   public getInitialState(): {
@@ -109,10 +130,10 @@ export class GenericStage implements IStage {
   private getCharacterDTOs(): CharacterDTO[] {
     let arr: CharacterDTO[] = [];
     this.playerMap.forEach((player) => {
-      arr.push(player.toDTO());
+      if (player.getIsAlive()) arr.push(player.toDTO());
     });
     this.npcMap.forEach((npc) => {
-      arr.push(npc.toDTO());
+      if (npc.getIsAlive()) arr.push(npc.toDTO());
     });
     return arr;
   }
@@ -181,7 +202,7 @@ export class GenericStage implements IStage {
   protected setCols(cols: number): void {
     this.cols = cols;
   }
-  protected setMap(map: GameObject[][]): void {
+  protected setMap(map: Cell[][]): void {
     this.map = map;
   }
 
@@ -193,11 +214,15 @@ export class GenericStage implements IStage {
 
   public updatePlayers(deltaTime: number): void {
     this.playerMap.forEach((player: Player) => {
-      player.update(deltaTime, this);
+      if (player.getIsAlive()) {
+        player.update(deltaTime, this);
+      }
     });
   }
 
-  public createBomb(id: number): void {}
+  public playerPutBomb(playerId: number): void {
+    this.playerMap.get(playerId).putBomb();
+  }
 
   public movePlayer(id: number, movement: Movement): void {
     this.playerMap.get(id).setMovement(movement);

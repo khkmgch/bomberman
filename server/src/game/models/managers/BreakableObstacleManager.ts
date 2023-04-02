@@ -1,4 +1,4 @@
-import { BreakableObstacle } from '../objects/BreakableObstacle';
+import { BreakableObstacle } from '../objects/map/obstacle/BreakableObstacle';
 
 export class BreakableObstacleManager {
   private currId: number = 0;

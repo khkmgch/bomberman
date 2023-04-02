@@ -1,21 +1,30 @@
 import { Scene } from 'phaser';
 import { Socket } from 'socket.io-client';
 import Constant from '../../../server/src/constant';
+import { IBombDTO } from '../dtos/interface/IBombDTO';
 import { IBreakableObstacleDTO } from '../dtos/interface/IBreakableObstacleDTO';
 import { ICharacterDTO } from '../dtos/interface/ICharacterDTO';
 import { IEdgeObstacleDTO } from '../dtos/interface/IEdgeObstacleDTO';
+import { IExplosionDTO } from '../dtos/interface/IExplosionDTO';
 import { IFixedObstacleDTO } from '../dtos/interface/IFixedObstacleDTO';
 import { IGroundDTO } from '../dtos/interface/IGroundDTO';
+import { IItemDTO } from '../dtos/interface/IItemDTO';
+import { IMarkerDTO } from '../dtos/interface/IMarkerDTO';
 import { Guards } from '../guards/guards';
+import { IBomb } from '../interfaces/IBomb';
 import { IBreakableObstacle } from '../interfaces/IBreakableObstacle';
 import { ICharacter } from '../interfaces/ICharacter';
 import { IEdgeObstacle } from '../interfaces/IEdgeObstacle';
+import { IExplosion } from '../interfaces/IExplosion';
 import { IFixedObstacle } from '../interfaces/IFixedObstacle';
 import { IGround } from '../interfaces/IGround';
+import { IItem } from '../interfaces/IItem';
+import { IMarker } from '../interfaces/IMarker';
 import { InputManager } from '../models/InputManager';
 import { Objects } from '../types/Objects';
 import { GameUtil } from '../utils/GameUtil';
 import { SyncUtil } from '../utils/SyncUtil';
+import { ISyncItemsDTO } from '../dtos/interface/ISyncItemsDTO';
 
 export default class Game extends Scene {
   private centerX: number;
@@ -27,11 +36,24 @@ export default class Game extends Scene {
     breakableObstacleMap: new Map<number, IBreakableObstacle>(),
     fixedObstacleMap: new Map<number, IFixedObstacle>(),
     edgeObstacleMap: new Map<number, IEdgeObstacle>(),
-    bombMap: {},
-    explosionMap: {},
-    itemMap: {},
+    bombMap: new Map<number, IBomb>(),
+    markerMap: new Map<number, IMarker>(),
+    explosionMap: new Map<number, IExplosion>(),
+    itemMap: new Map<number, IItem>(),
   };
   private inputManager: InputManager;
+
+  private header: {
+    timeText: Phaser.GameObjects.Text | null;
+    fireUpText: Phaser.GameObjects.Text | null;
+    bombUpText: Phaser.GameObjects.Text | null;
+    speedUpText: Phaser.GameObjects.Text | null;
+  } = {
+    timeText: null,
+    fireUpText: null,
+    bombUpText: null,
+    speedUpText: null,
+  };
 
   constructor() {
     super(Constant.SCENE.GAME);
@@ -55,34 +77,15 @@ export default class Game extends Scene {
     this.centerX = this.cameras.main.centerX;
     this.centerY = this.cameras.main.centerY;
 
-    // this.add
-    //   .sprite(200, 200, 'flower_white')
-    //   .play({ key: 'flower_white-anim', repeat: -1, frameRate: 1 })
-    //   .setScale(1.0);
-    // this.add
-    //   .sprite(400, 200, 'flower_red')
-    //   .play({ key: 'flower_red-anim', repeat: -1, frameRate: 1 })
-    //   .setScale(1.0);
-    // this.add
-    //   .sprite(600, 200, 'grass1')
-    //   .play({ key: 'grass1-anim', repeat: -1, frameRate: 1 })
-    //   .setScale(1.0);
-    // this.add
-    //   .sprite(200, 400, 'grass2')
-    //   .play({ key: 'grass2-anim', repeat: -1, frameRate: 1 })
-    //   .setScale(1.0);
-    // this.add
-    //   .sprite(400, 400, 'grass3')
-    //   .play({ key: 'grass3-anim', repeat: -1, frameRate: 1 })
-    //   .setScale(1.0);
     this.addSocketListeners();
     this.socket.emit('ReadyToReceiveGame');
+
+    //ヘッダーを作成
+    GameUtil.createHeader(this);
   }
 
   public update(): void {
     this.inputManager.update();
-
-    // SyncUtil.updateCharacter(this);
   }
 
   /* getter - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -90,17 +93,45 @@ export default class Game extends Scene {
   public getObjects(): Objects {
     return this.objects;
   }
+  public getCenterX(): number {
+    return this.centerX;
+  }
+  public getCenterY(): number {
+    return this.centerY;
+  }
+  public getHeader(): {
+    timeText: Phaser.GameObjects.Text | null;
+    fireUpText: Phaser.GameObjects.Text | null;
+    bombUpText: Phaser.GameObjects.Text | null;
+    speedUpText: Phaser.GameObjects.Text | null;
+  } {
+    return this.header;
+  }
 
   /* setter - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
   public setSocket(socket: Socket): void {
     this.socket = socket;
   }
+
   /* socket - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
   private addSocketListeners(): void {
     this.onGetInitialState();
     this.onSyncState();
+    this.onSyncTime();
     this.onCountDown();
+    this.onAddBomb();
+    this.onRemoveBomb();
+    this.onAddMarkers();
+    this.onRemoveMarkers();
+    this.onAddExplosions();
+    this.onRemoveExplosions();
+    this.onRemoveBreakableObstacle();
+    this.onAddItem();
+    this.onRemoveItem();
+    this.onDamaged();
+    this.onDead();
+    this.onSyncItems();
   }
   private removeSocketListeners(): void {}
 
@@ -116,11 +147,11 @@ export default class Game extends Scene {
       }) => {
         try {
           if (Guards.isGetInitialStateDTO(data)) {
-            SyncUtil.setGrounds(data.groundArr, this);
-            SyncUtil.setEdgeObstacles(data.edgeObstacleArr, this);
-            SyncUtil.setFixedObstacles(data.fixedObstacleArr, this);
-            SyncUtil.setBreakableObstacles(data.breakableObstacleArr, this);
-            SyncUtil.setCharacters(data.characterArr, this);
+            SyncUtil.addGrounds(data.groundArr, this);
+            SyncUtil.addEdgeObstacles(data.edgeObstacleArr, this);
+            SyncUtil.addFixedObstacles(data.fixedObstacleArr, this);
+            SyncUtil.addBreakableObstacles(data.breakableObstacleArr, this);
+            SyncUtil.addCharacters(data.characterArr, this);
           } else {
             throw new Error('Invalid data format');
           }
@@ -132,14 +163,198 @@ export default class Game extends Scene {
   }
   private onSyncState(): void {
     this.socket.on('SyncState', (data: { characterArr: ICharacterDTO[] }) => {
-      // console.log(data);
-      SyncUtil.setCharacters(data.characterArr, this);
+      SyncUtil.addCharacters(data.characterArr, this);
       SyncUtil.updateCharacter(this);
+    });
+  }
+  private onSyncTime(): void {
+    this.socket.on('SyncTime', (data: { timeStr: string }) => {
+      try {
+        if (Guards.isSyncTimeDTO(data)) {
+          this.header.timeText?.setText(data.timeStr);
+        } else throw new Error('Invalid data format');
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  }
+  private onAddBomb(): void {
+    this.socket.on('AddBomb', (data: { bomb: IBombDTO }) => {
+      try {
+        if (Guards.isAddBombDTO(data)) {
+          SyncUtil.addBomb(data.bomb, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  }
+  private onRemoveBomb(): void {
+    this.socket.on('RemoveBomb', (data: { id: number }) => {
+      try {
+        if (Guards.isRemoveBombDTO(data)) {
+          SyncUtil.removeBomb(data.id, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  }
+  private onAddMarkers(): void {
+    this.socket.on('AddMarkers', (data: { markerArr: IMarkerDTO[] }) => {
+      try {
+        if (Guards.isAddMarkersDTO(data)) {
+          SyncUtil.addMarkers(data.markerArr, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  }
+  private onRemoveMarkers(): void {
+    this.socket.on('RemoveMarkers', (data: { idArr: number[] }) => {
+      try {
+        if (Guards.isRemoveMarkersDTO(data)) {
+          SyncUtil.removeMarkers(data.idArr, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  }
+  private onAddExplosions(): void {
+    this.socket.on(
+      'AddExplosions',
+      (data: { explosionArr: IExplosionDTO[] }) => {
+        try {
+          if (Guards.isAddExplosionsDTO(data)) {
+            SyncUtil.addExplosions(data.explosionArr, this);
+          } else {
+            throw new Error('Invalid data format');
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    );
+  }
+  private onRemoveExplosions(): void {
+    this.socket.on('RemoveExplosions', (data: { idArr: number[] }) => {
+      try {
+        if (Guards.isRemoveExplosionsDTO(data)) {
+          SyncUtil.removeExplosions(data.idArr, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  }
+  private onRemoveBreakableObstacle(): void {
+    this.socket.on('RemoveBreakableObstacle', (data: { id: number }) => {
+      try {
+        if (Guards.isRemoveBreakableObstacleDTO(data)) {
+          SyncUtil.removeRemoveBreakableObstacle(data.id, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  }
+  private onAddItem(): void {
+    this.socket.on('AddItem', (data: { item: IItemDTO }) => {
+      try {
+        if (Guards.isAddItemDTO(data)) {
+          SyncUtil.addItem(data.item, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  }
+  private onRemoveItem(): void {
+    this.socket.on('RemoveItem', (data: { id: number }) => {
+      try {
+        if (Guards.isRemoveItemDTO(data)) {
+          SyncUtil.removeItem(data.id, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  }
+  private onDamaged(): void {
+    this.socket.on('Damaged', (data: { id: number }) => {
+      try {
+        if (Guards.isDamagedDTO(data)) {
+          SyncUtil.flashCharacter(data.id, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  }
+  private onDead(): void {
+    this.socket.on('Dead', (data: { id: number }) => {
+      try {
+        if (Guards.isDeadDTO(data)) {
+          SyncUtil.removeCharacter(data.id, this);
+        } else {
+          throw new Error('Invalid data format');
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  }
+  private onSyncItems(): void {
+    this.socket.on('SyncItems', (data: { items: ISyncItemsDTO }) => {
+      try {
+        if (Guards.isSyncItemsDTO(data)) {
+          this.header.bombUpText?.setText(`× ${data.items.bombUp}`);
+          this.header.fireUpText?.setText(`× ${data.items.fireUp}`);
+          this.header.speedUpText?.setText(`× ${data.items.speedUp}`);
+        } else {
+          throw new Error('Invalid data format');
+        }
+      } catch (error) {
+        console.error(error);
+      }
     });
   }
   private onCountDown(): void {
     this.socket.on('CountDown', (data: { countDown: number }) => {
-      GameUtil.setCountDown(data.countDown, this, this.centerX, this.centerY);
+      try {
+        if (Guards.isCountDownDTO(data)) {
+          GameUtil.setCountDown(
+            data.countDown,
+            this,
+            this.centerX,
+            this.centerY
+          );
+        } else {
+          throw new Error('Invalid data format');
+        }
+      } catch (error) {
+        console.error(error);
+      }
     });
   }
 }

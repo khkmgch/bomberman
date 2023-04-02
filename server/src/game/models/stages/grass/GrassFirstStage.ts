@@ -2,9 +2,11 @@ import Constant from 'src/constant';
 import { EventsGateway } from 'src/events/events.gateway';
 import { IFirstStage } from 'src/game/interfaces/stage/IFirstStage';
 import { MathUtil } from 'src/game/utils/MathUtil';
-import { GameObject } from '../../objects/GameObject';
+import { Npc } from '../../objects/character/Npc';
+import { Player } from '../../objects/character/Player';
 import { User } from '../../User';
 import { GrassStage } from './GrassStage';
+import { Cell } from 'src/game/types/Cell';
 
 // 草原ファーストステージクラス
 export class GrassFirstStage extends GrassStage implements IFirstStage {
@@ -22,9 +24,9 @@ export class GrassFirstStage extends GrassStage implements IFirstStage {
   }
 
   private initMap(): void {
-    let map: GameObject[][] = new Array<Array<GameObject>>(this.cols);
+    let map: Cell[][] = new Array<Array<Cell>>(this.cols);
     for (let i = 0; i < this.cols; i++) {
-      map[i] = new Array<GameObject>(this.rows);
+      map[i] = new Array<Cell>(this.rows);
       for (let j = 0; j < this.rows; j++) {
         if (i === 0 || i === this.cols - 1 || j === 0 || j === this.rows - 1) {
           this.addEdgeObstacle(map, i, j);
@@ -50,14 +52,59 @@ export class GrassFirstStage extends GrassStage implements IFirstStage {
           }
           continue;
         }
-        const randomInt = MathUtil.getRandomInt(0, 4);
-        if (randomInt <= 1) {
+
+        if (Math.random() < 0.5) {
           this.addBreakableObstacle(map, i, j);
           continue;
         }
-        map[i][j] = null;
       }
     }
     this.setMap(map);
+  }
+
+  protected addPlayers(): void {
+    const userMap: Map<string, User> = this.eventsGateway.roomService
+      .getRoomMap()
+      .get(this.roomId)
+      .getUserMap();
+    for (const user of userMap) {
+      this.playerMap.set(user[1].getId(), this.createPlayer(user[1]));
+    }
+  }
+
+  private createPlayer(user: User): Player {
+    const id: number = user.getId();
+    const {
+      x,
+      y,
+    }: {
+      x: number;
+      y: number;
+    } = this.getCharacterInitialPosition(id);
+
+    return new Player(id, user.getSocket(), user.getUserName(), x, y, this);
+  }
+
+  protected addNpcs(): void {
+    for (let i = 0; i < Constant.MAX_PLAYERS_PER_ROOM; i++) {
+      if (!this.playerMap.has(i)) {
+        this.npcMap.set(i, this.createNpc(i));
+      }
+    }
+  }
+  private createNpc(id: number): Npc {
+    const name: string =
+      GrassStage.NPC_NAME_ARR[
+        MathUtil.getRandomInt(0, GrassStage.NPC_NAME_ARR.length)
+      ];
+    const {
+      x,
+      y,
+    }: {
+      x: number;
+      y: number;
+    } = this.getCharacterInitialPosition(id);
+
+    return new Npc(id, name, x, y, this);
   }
 }

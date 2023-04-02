@@ -6,6 +6,11 @@ import { IEdgeObstacleDTO } from '../dtos/interface/IEdgeObstacleDTO';
 import { IBreakableObstacleDTO } from '../dtos/interface/IBreakableObstacleDTO';
 import { ICharacterDTO } from '../dtos/interface/ICharacterDTO';
 import { IFixedObstacleDTO } from '../dtos/interface/IFixedObstacleDTO';
+import { IBombDTO } from '../dtos/interface/IBombDTO';
+import { IMarkerDTO } from '../dtos/interface/IMarkerDTO';
+import { IExplosionDTO } from '../dtos/interface/IExplosionDTO';
+import { IItem } from '../interfaces/IItem';
+import { ISyncItemsDTO } from '../dtos/interface/ISyncItemsDTO';
 
 export class Guards {
   static isIRoomDTO(obj: any): obj is IRoomDTO {
@@ -107,30 +112,32 @@ export class Guards {
     );
   }
   static isGroundDTO(obj: any): obj is IGroundDTO {
-    return (
-      Guards.isGameObjectDTO(obj) && 'id' in obj && typeof obj.id === 'number'
-    );
+    return Guards.isGameObjectDTO(obj);
   }
   static isEdgeObstacleDTO(obj: any): obj is IEdgeObstacleDTO {
-    return (
-      Guards.isGameObjectDTO(obj) && 'id' in obj && typeof obj.id === 'number'
-    );
+    return Guards.isGameObjectDTO(obj);
   }
   static isFixedObstacleDTO(obj: any): obj is IFixedObstacleDTO {
-    return (
-      Guards.isGameObjectDTO(obj) && 'id' in obj && typeof obj.id === 'number'
-    );
+    return Guards.isGameObjectDTO(obj);
   }
   static isBreakableObstacleDTO(obj: any): obj is IBreakableObstacleDTO {
-    return (
-      Guards.isGameObjectDTO(obj) && 'id' in obj && typeof obj.id === 'number'
-    );
+    return Guards.isGameObjectDTO(obj);
   }
   static isCharacterDTO(obj: any): obj is ICharacterDTO {
+    console.log(obj);
+    console.log(
+      Guards.isGameObjectDTO(obj) &&
+        'name' in obj &&
+        typeof obj.name === 'string' &&
+        'direction' in obj &&
+        typeof obj.direction === 'number' &&
+        'stock' in obj &&
+        typeof obj.stock === 'number' &&
+        'initStock' in obj &&
+        typeof obj.initStock === 'number'
+    );
     return (
       Guards.isGameObjectDTO(obj) &&
-      'id' in obj &&
-      typeof obj.id === 'number' &&
       'name' in obj &&
       typeof obj.name === 'string' &&
       'direction' in obj &&
@@ -143,6 +150,8 @@ export class Guards {
   }
   static isGameObjectDTO(obj: any): obj is IGameObjectDTO {
     return (
+      'id' in obj &&
+      typeof obj.id === 'number' &&
       'x' in obj &&
       typeof obj.x === 'number' &&
       'y' in obj &&
@@ -155,10 +164,89 @@ export class Guards {
       typeof obj.animation === 'string'
     );
   }
+  static isSyncTimeDTO(obj: any): boolean {
+    return 'timeStr' in obj && typeof obj.timeStr === 'string';
+  }
+  static isAddBombDTO(obj: any) {
+    return 'bomb' in obj && Guards.isIBombDTO(obj.bomb);
+  }
+  static isIBombDTO(obj: any): obj is IBombDTO {
+    return Guards.isGameObjectDTO(obj);
+  }
+  static isRemoveBombDTO(obj: any): boolean {
+    return 'id' in obj && typeof obj.id === 'number';
+  }
+  static isAddMarkersDTO(obj: any) {
+    return (
+      'markerArr' in obj &&
+      Array.isArray(obj.markerArr) &&
+      obj.markerArr.every((marker: any) => Guards.isIMarkerDTO(marker))
+    );
+  }
+  static isIMarkerDTO(obj: any): obj is IMarkerDTO {
+    return Guards.isGameObjectDTO(obj);
+  }
+  static isRemoveMarkersDTO(obj: any): boolean {
+    return (
+      'idArr' in obj &&
+      Array.isArray(obj.idArr) &&
+      obj.idArr.every((id: any) => typeof id === 'number')
+    );
+  }
+  static isAddExplosionsDTO(obj: any) {
+    return (
+      'explosionArr' in obj &&
+      Array.isArray(obj.explosionArr) &&
+      obj.explosionArr.every((explosion: any) =>
+        Guards.isIExplosionDTO(explosion)
+      )
+    );
+  }
+  static isIExplosionDTO(obj: any): obj is IExplosionDTO {
+    return Guards.isGameObjectDTO(obj);
+  }
+  static isRemoveExplosionsDTO(obj: any) {
+    return (
+      'idArr' in obj &&
+      Array.isArray(obj.idArr) &&
+      obj.idArr.every((id: any) => typeof id === 'number')
+    );
+  }
+  static isRemoveBreakableObstacleDTO(obj: any) {
+    return 'id' in obj && typeof obj.id === 'number';
+  }
 
-  id: number;
-  name: string;
-  direction: number;
-  stock: number;
-  initStock: number;
+  static isAddItemDTO(obj: any) {
+    return 'item' in obj && Guards.isIItemDTO(obj.item);
+  }
+  static isIItemDTO(obj: any): obj is IItem {
+    return Guards.isGameObjectDTO(obj);
+  }
+  static isRemoveItemDTO(obj: any): boolean {
+    return 'id' in obj && typeof obj.id === 'number';
+  }
+  static isDamagedDTO(obj: any): boolean {
+    return 'id' in obj && typeof obj.id === 'number';
+  }
+  static isDeadDTO(obj: any): boolean {
+    return 'id' in obj && typeof obj.id === 'number';
+  }
+  static isISyncItemsDTO(obj: any): obj is ISyncItemsDTO {
+    return (
+      'fireUp' in obj &&
+      typeof obj.fireUp === 'number' &&
+      'bombUp' in obj &&
+      typeof obj.bombUp === 'number' &&
+      'speedUp' in obj &&
+      typeof obj.speedUp === 'number' &&
+      'healUp' in obj &&
+      typeof obj.healUp === 'number'
+    );
+  }
+  static isSyncItemsDTO(obj: any): boolean {
+    return 'items' in obj && Guards.isISyncItemsDTO(obj.items);
+  }
+  static isCountDownDTO(obj: any): boolean {
+    return 'countDown' in obj && typeof obj.countDown === 'number';
+  }
 }

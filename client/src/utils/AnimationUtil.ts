@@ -70,7 +70,7 @@ export default class AnimationUtil {
     anims.create({
       key: `${Constant.ATTACK.BOMB}-anim`,
       frameRate: 10,
-      repeat: 2,
+      repeat: -1,
       frames: anims.generateFrameNumbers(Constant.ATTACK.BOMB, {
         start: 0,
         end: 7,
@@ -127,17 +127,7 @@ export default class AnimationUtil {
       });
     }
   }
-  // static setPlayerAnimation(
-  //   sprite: Phaser.GameObjects.Sprite,
-  //   animation: string,
-  //   direction: number
-  // ) {
-  //   if (!sprite.anims.isPlaying) sprite.play(animation);
-  //   else if (sprite.anims.getName() !== animation) sprite.play(animation);
-  //   //左に進むときは右方向の動きを反転させる
-  //   sprite.setFlipX(direction === 3);
-  // }
-  static setCatAnimation(
+  static setCatAnim(
     sprite: Phaser.GameObjects.Sprite,
     animation: string,
     direction: number
@@ -160,5 +150,20 @@ export default class AnimationUtil {
     if (!sprite.anims.isPlaying) sprite.play({ key: animation, repeat: -1 });
     else if (sprite.anims.getName() !== animation)
       sprite.play({ key: animation, repeat: -1 });
+  }
+
+  static setBombAnim(
+    sprite: Phaser.GameObjects.Sprite,
+    animation: string
+  ) {
+    if (!sprite.anims.isPlaying) sprite.play(animation);
+    else if (sprite.anims.getName() !== animation) sprite.play(animation);
+  }
+  static setExplosionAnim(
+    sprite: Phaser.GameObjects.Sprite,
+    animation: string
+  ) {
+    if (!sprite.anims.isPlaying) sprite.play(animation);
+    else if (sprite.anims.getName() !== animation) sprite.play(animation);
   }
 }

@@ -1,15 +1,13 @@
 import Constant from 'src/constant';
 import { EventsGateway } from 'src/events/events.gateway';
 import { MathUtil } from 'src/game/utils/MathUtil';
-import { BreakableObstacle } from '../../objects/BreakableObstacle';
-import { EdgeObstacle } from '../../objects/EdgeObstacle';
-import { FixedObstacle } from '../../objects/FixedObstacle';
+import { BreakableObstacle } from '../../objects/map/obstacle/BreakableObstacle';
+import { EdgeObstacle } from '../../objects/map/obstacle/EdgeObstacle';
+import { FixedObstacle } from '../../objects/map/obstacle/FixedObstacle';
 import { GameObject } from '../../objects/GameObject';
-import { Ground } from '../../objects/Ground';
-import { Npc } from '../../objects/Npc';
-import { Player } from '../../objects/Player';
-import { User } from '../../User';
+import { Ground } from '../../objects/map/Ground';
 import { GenericStage } from '../generic/GenericStage';
+import { Cell } from 'src/game/types/Cell';
 
 // 草原ステージクラス
 export class GrassStage extends GenericStage {
@@ -23,6 +21,8 @@ export class GrassStage extends GenericStage {
     EDGE_OBSTACLE: Constant.WATER,
     FIXED_OBSTACLE: Constant.ROCK,
     BREAKABLE_OBSTACLE: Constant.BOX,
+    ATTACK: Constant.ATTACK,
+    ITEM: Constant.ITEM,
   };
   static readonly NPC_NAME_ARR: string[] = [
     'Mochi',
@@ -52,53 +52,7 @@ export class GrassStage extends GenericStage {
     return `${super.getType()}\n${this.getInfo()}`;
   }
 
-  protected addPlayers(): void {
-    const userMap: Map<string, User> = this.eventsGateway.roomService
-      .getRoomMap()
-      .get(this.roomId)
-      .getUserMap();
-    for (const user of userMap) {
-      this.playerMap.set(user[1].getId(), this.createPlayer(user[1]));
-    }
-  }
-
-  private createPlayer(user: User): Player {
-    const id: number = user.getId();
-    const {
-      x,
-      y,
-    }: {
-      x: number;
-      y: number;
-    } = this.getCharacterInitialPosition(id);
-
-    return new Player(id, user.getSocket(), user.getUserName(), x, y);
-  }
-
-  protected addNpcs(): void {
-    for (let i = 0; i < Constant.MAX_PLAYERS_PER_ROOM; i++) {
-      if (!this.playerMap.has(i)) {
-        this.npcMap.set(i, this.createNpc(i));
-      }
-    }
-  }
-  private createNpc(id: number) {
-    const name: string =
-      GrassStage.NPC_NAME_ARR[
-        MathUtil.getRandomInt(0, GrassStage.NPC_NAME_ARR.length)
-      ];
-    const {
-      x,
-      y,
-    }: {
-      x: number;
-      y: number;
-    } = this.getCharacterInitialPosition(id);
-
-    return new Npc(id, name, x, y);
-  }
-
-  protected addGround(map: GameObject[][], i: number, j: number) {
+  protected addGround(map: Cell[][], i: number, j: number) {
     const x: number = i * this.tileSize;
     const y: number = j * this.tileSize;
     const id: number = this.groundManager.getCurrId();
@@ -131,10 +85,13 @@ export class GrassStage extends GenericStage {
     this.groundManager.incrementCurrId();
 
     //mapに追加
-    // map[i][j] = ground;
+    map[i][j] = {
+      entity: null,
+      item: null,
+    };
   }
 
-  protected addEdgeObstacle(map: GameObject[][], i: number, j: number) {
+  protected addEdgeObstacle(map: Cell[][], i: number, j: number) {
     const x: number = i * this.tileSize;
     const y: number = j * this.tileSize;
     const id: number = this.edgeObstacleManager.getCurrId();
@@ -150,9 +107,12 @@ export class GrassStage extends GenericStage {
     this.edgeObstacleManager.incrementCurrId();
 
     //mapに追加
-    map[i][j] = edgeObstacle;
+    map[i][j] = {
+      entity: edgeObstacle,
+      item: null,
+    };
   }
-  protected addFixedObstacle(map: GameObject[][], i: number, j: number) {
+  protected addFixedObstacle(map: Cell[][], i: number, j: number) {
     const x = i * this.tileSize;
     const y = j * this.tileSize;
     const id = this.fixedObstacleManager.getCurrId();
@@ -170,9 +130,12 @@ export class GrassStage extends GenericStage {
     this.fixedObstacleManager.incrementCurrId();
 
     //mapに追加
-    map[i][j] = fixedObstacle;
+    map[i][j] = {
+      entity: fixedObstacle,
+      item: null,
+    };
   }
-  protected addBreakableObstacle(map: GameObject[][], i: number, j: number) {
+  protected addBreakableObstacle(map: Cell[][], i: number, j: number) {
     const x = i * this.tileSize;
     const y = j * this.tileSize;
     const id = this.breakableObstacleManager.getCurrId();
@@ -188,6 +151,9 @@ export class GrassStage extends GenericStage {
     this.breakableObstacleManager.incrementCurrId();
 
     //mapに追加
-    map[i][j] = breakableObstacle;
+    map[i][j] = {
+      entity: breakableObstacle,
+      item: null,
+    };
   }
 }

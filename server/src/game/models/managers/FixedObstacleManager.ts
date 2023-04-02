@@ -1,4 +1,4 @@
-import { FixedObstacle } from '../objects/FixedObstacle';
+import { FixedObstacle } from '../objects/map/obstacle/FixedObstacle';
 
 export class FixedObstacleManager {
   protected currId: number = 0;

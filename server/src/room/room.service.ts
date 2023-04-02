@@ -167,6 +167,11 @@ export class RoomService {
     //ルームのステータスを削除中に設定
     room.setIsRemoving(true);
 
+    if (room.getGame() !== null) {
+      room.getGame().offUpdate();
+      room.getGame().setStage(null);
+    }
+
     //ルームを削除
     this.roomMap.delete(roomId);
   }
@@ -354,6 +359,39 @@ export class RoomService {
             if (stage) {
               if (stage.playerExists(user.getId())) {
                 stage.movePlayer(user.getId(), movement);
+              } else {
+                throw new Error('Player not found');
+              }
+            } else {
+              throw new Error('Stage not found');
+            }
+          } else {
+            throw new Error('Input can not be accepted');
+          }
+        } else {
+          throw new Error('Game not found');
+        }
+      } else {
+        throw new Error('User not found');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  //爆弾を設置する
+  putBomb(socket: Socket) {
+    try {
+      if (this.userExists(socket.roomId, socket.id)) {
+        const room: Room = this.getRoomMap().get(socket.roomId);
+        const user: User = room.getUserMap().get(socket.id);
+        const game: Game = room.getGame();
+        if (game) {
+          if (game.getIsAcceptingInput()) {
+            const stage = game.getStage();
+            if (stage) {
+              if (stage.playerExists(user.getId())) {
+                stage.playerPutBomb(user.getId());
               } else {
                 throw new Error('Player not found');
               }

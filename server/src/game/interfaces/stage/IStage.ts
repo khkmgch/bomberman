@@ -5,13 +5,18 @@ import { EdgeObstacleManager } from 'src/game/models/managers/EdgeObstacleManage
 import { FixedObstacleManager } from 'src/game/models/managers/FixedObstacleManager';
 import { GroundManager } from 'src/game/models/managers/GroundManager';
 import { GameObject } from 'src/game/models/objects/GameObject';
-import { Npc } from 'src/game/models/objects/Npc';
-import { Player } from 'src/game/models/objects/Player';
+import { Npc } from 'src/game/models/objects/character/Npc';
+import { Player } from 'src/game/models/objects/character/Player';
 import { Movement } from 'src/game/types/Movement';
 import { EdgeObstacleDTO } from 'src/game/dtos/EdgeObstacleDTO';
 import { FixedObstacleDTO } from 'src/game/dtos/FixedObstacleDTO';
 import { BreakableObstacleDTO } from 'src/game/dtos/BreakableObstacleDTO';
 import { CharacterDTO } from 'src/game/dtos/CharacterDTO';
+import { BombManager } from 'src/game/models/managers/BombManager';
+import { MarkerManager } from 'src/game/models/managers/MarkerManager';
+import { ExplosionManager } from 'src/game/models/managers/ExplosionManager';
+import { ItemManager } from 'src/game/models/managers/ItemManager';
+import { Cell } from 'src/game/types/Cell';
 
 // ステージインターフェース
 export interface IStage {
@@ -22,7 +27,7 @@ export interface IStage {
   getTileSize(): number;
   getRows(): number;
   getCols(): number;
-  getMap(): GameObject[][];
+  getMap(): Cell[][];
 
   getGroundManager(): GroundManager;
   getEdgeObstacleManager(): EdgeObstacleManager;
@@ -30,6 +35,10 @@ export interface IStage {
   getBreakableObstacleManager(): BreakableObstacleManager;
   getPlayerMap(): Map<number, Player>;
   getNpcMap(): Map<number, Npc>;
+  getBombManager(): BombManager;
+  getMarkerManager(): MarkerManager;
+  getExplosionManager(): ExplosionManager;
+  getItemManager(): ItemManager;
 
   getInitialState(): {
     groundArr: GroundDTO[];
@@ -44,7 +53,7 @@ export interface IStage {
 
   update(deltaTime: number): void;
 
-  createBomb(id: number): void;
+  playerPutBomb(playerId: number): void;
 
   movePlayer(id: number, movement: Movement): void;
 
