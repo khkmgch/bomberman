@@ -18,6 +18,8 @@ export default class Constant {
     FINISHED: 'FINISHED',
   };
 
+  static readonly INVINCIBLE_DURATION = 2000;
+
   /* サイズ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
   static readonly TILE = {
@@ -77,6 +79,13 @@ export default class Constant {
   static readonly ATTACK = {
     BOMB: 'bomb',
     EXPLOSION: 'explosion',
+    MARKER: 'cat_paw',
+  };
+  static readonly ITEM = {
+    SPEED: 'speed_up',
+    FIRE: 'fire_up',
+    BOMB: 'bomb_up',
+    HEAL: 'heal_up',
   };
 
   static readonly GITHUB = 'github';
