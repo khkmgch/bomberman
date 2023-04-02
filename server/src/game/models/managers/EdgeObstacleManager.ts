@@ -1,4 +1,4 @@
-import { EdgeObstacle } from '../objects/EdgeObstacle';
+import { EdgeObstacle } from '../objects/map/obstacle/EdgeObstacle';
 
 export class EdgeObstacleManager {
   protected currId: number = 0;

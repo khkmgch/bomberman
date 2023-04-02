@@ -1,4 +1,4 @@
-import { Ground } from '../objects/Ground';
+import { Ground } from '../objects/map/Ground';
 
 export class GroundManager {
   protected currId: number = 0;
