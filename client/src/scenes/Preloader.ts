@@ -54,12 +54,16 @@ export default class Preloader extends Scene {
         frameHeight,
       });
     }
-    //爆弾と爆風
+    //爆弾・爆風・マーカー
     for (const value of Object.values(Constant.ATTACK)) {
       this.load.spritesheet(value, `assets/attack/${value}.png`, {
         frameWidth,
         frameHeight,
       });
+    }
+    //アイテム
+    for (const value of Object.values(Constant.ITEM)) {
+      this.load.image(value, `assets/item/${value}.png`);
     }
 
     //花
