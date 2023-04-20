@@ -208,15 +208,12 @@ export default class Lobby extends Scene {
     this.events.off('create_room', this.createRoom, this);
     this.events.off('start_game', this.startGame, this);
 
-    // アニメーションの停止
-    // this.anims.pauseAll();
-
     // オブジェクトの削除
     this.children.removeAll(true);
   }
 
   private updateTableOfRooms() {
-    const rooms = this.getRooms();
+    const rooms: IRoomDTO[] = this.getRooms();
     if (rooms.length <= 0) {
       rooms.push({
         id: '0',
@@ -376,12 +373,18 @@ export default class Lobby extends Scene {
   }
 
   private upsertPlayerPanel(player: IUserDTO) {
-    const dialog = this.getRoomDialog();
+    const dialog: Dialog | null = this.getRoomDialog();
     if (dialog !== null) {
-      const dialogContent = dialog.getElement('content') as GridSizer;
-      const playerPanel = dialogContent.getChildren().at(player.id) as Label;
+      const dialogContent: GridSizer = dialog.getElement(
+        'content'
+      ) as GridSizer;
+      const playerPanel: Label = dialogContent
+        .getChildren()
+        .at(player.id) as Label;
       playerPanel.setText(player.userName);
-      const icon = playerPanel.getElement('icon') as ContainerLite;
+      const icon: ContainerLite = playerPanel.getElement(
+        'icon'
+      ) as ContainerLite;
       icon.getChildren().forEach((child: any, i: number) => {
         if (i === 0) {
           if (player.state === Constant.PLAYER_STATE.READY) {
