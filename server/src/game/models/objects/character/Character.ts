@@ -11,6 +11,12 @@ import { Bomb } from '../attack/Bomb';
 import { Explosion } from '../attack/Explosion';
 import { GameObject } from '../GameObject';
 import { Item } from '../item/Item';
+import { StageUtil } from 'src/game/utils/StageUtil';
+import { EdgeObstacle } from '../map/obstacle/EdgeObstacle';
+import { FixedObstacle } from '../map/obstacle/FixedObstacle';
+import { BreakableObstacle } from '../map/obstacle/BreakableObstacle';
+import { NpcUtil } from 'src/game/utils/NpcUtil';
+import { RankingManager } from '../../managers/rankingManager';
 
 export abstract class Character extends GameObject {
   protected item: {
@@ -42,6 +48,7 @@ export abstract class Character extends GameObject {
   protected invincible: boolean = false;
   protected isAlive: boolean = true;
   protected bombMap: Map<number, Bomb> = new Map<number, Bomb>();
+  protected impactMapWithMyself: number[][] = [];
 
   constructor(
     id: number,
@@ -56,6 +63,13 @@ export abstract class Character extends GameObject {
       y,
       CharacterUtil.getCatSpriteFromId(id),
       `${CharacterUtil.getCatSpriteFromId(id)}-turn-down`,
+    );
+    const { i, j }: Index = this.getIndex();
+    const cell: Cell = this.stage.getMap()[i][j];
+    //影響マップを更新
+    this.impactMapWithMyself = NpcUtil.createImpactMap(
+      cell,
+      this.stage.getMap(),
     );
   }
   public toDTO(): CharacterDTO {
@@ -108,6 +122,9 @@ export abstract class Character extends GameObject {
   public getBombMap(): Map<number, Bomb> {
     return this.bombMap;
   }
+  public getImpactMapWithMyself(): number[][] {
+    return this.impactMapWithMyself;
+  }
 
   /* setter - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -147,6 +164,9 @@ export abstract class Character extends GameObject {
   public setIsAlive(isAlive: boolean): void {
     this.isAlive = isAlive;
   }
+  public setImpactMapWithMyself(impactMapWithMyself: number[][]): void {
+    this.impactMapWithMyself = impactMapWithMyself;
+  }
 
   /* others - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -171,6 +191,10 @@ export abstract class Character extends GameObject {
     }
     //位置を更新
     this.setPosition(x, y);
+    const { i: nextI, j: nextJ }: Index = this.getIndex();
+    if (nextI !== i || nextJ !== j) {
+      //キャラクターの影響マップを更新
+    }
   }
 
   public putBomb(): void {
@@ -200,6 +224,8 @@ export abstract class Character extends GameObject {
     bombManager.getMap().set(id, bomb);
     //bombMapに追加
     this.bombMap.set(id, bomb);
+
+    this.stage.updateImpactMapWithExplosion();
   }
   // 爆風との当たり判定を行うメソッド
   protected overlapWithExplosion(map: Cell[][]): boolean {
@@ -230,6 +256,10 @@ export abstract class Character extends GameObject {
         setTimeout(() => {
           this.emitDead();
         }, Constant.INVINCIBLE_DURATION);
+
+        const rankingManager: RankingManager = this.stage.getRankingManager();
+        rankingManager.getMap().set(rankingManager.getCurrId(), this);
+        rankingManager.decrementCurrId();
       } else {
         setTimeout(() => {
           // 一定時間後に無敵状態を解除する
@@ -253,6 +283,90 @@ export abstract class Character extends GameObject {
       .getEventGateway()
       .server.in(this.stage.getRoomId())
       .emit('Dead', { id: this.id });
+  }
+
+  protected canMove(map: Cell[][], deltaTime: number): boolean {
+    return (
+      !this.collideWithBomb(map, deltaTime) &&
+      !this.collideWithObstacle(map, deltaTime)
+    );
+  }
+  //障害物との当たり判定
+  protected collideWithObstacle(map: Cell[][], deltaTime: number): boolean {
+    const cell: Cell = this.getNextCell(map, deltaTime);
+    return (
+      cell.entity instanceof EdgeObstacle ||
+      cell.entity instanceof FixedObstacle ||
+      cell.entity instanceof BreakableObstacle
+    );
+  }
+  //Bombとの当たり判定
+  protected collideWithBomb(map: Cell[][], deltaTime: number): boolean {
+    //現在のマスのインデックス
+    const { i: currI, j: currJ }: Index = this.getIndex();
+    //現在のマス
+    const currCell: Cell = map[currI][currJ];
+    if (currCell.entity === null || currCell.entity === undefined) {
+      const nextCell: Cell = this.getNextCell(map, deltaTime);
+      return nextCell.entity instanceof Bomb;
+    } else if (currCell.entity instanceof Bomb) {
+      //Bombと同じマスにいる場合
+
+      const { i: nextI, j: nextJ }: Index = this.getNextIndex(deltaTime);
+      //移動先の座標のインデックスが現在のインデックスと同じ場合
+      if (nextI === currI && nextJ === currJ) return false;
+
+      const nextCell: Cell = map[nextI][nextJ];
+      if (nextCell.entity instanceof Bomb) return true;
+      else return false;
+    } else return false;
+  }
+  //移動先のマスを返すメソッド
+  protected getNextCell(map: Cell[][], deltaTime: number): Cell {
+    const { i, j }: Index = this.getNextIndex(deltaTime);
+    return map[i][j];
+  }
+  //移動先の位置のインデックスを返すメソッド
+  protected getNextIndex(deltaTime: number): Index {
+    let { x: nextX, y: nextY }: Position = this.getPosition();
+    const { x: vX, y: vY }: Velocity = this.velocity;
+    switch (this.direction) {
+      case 0:
+        nextX += this.size / 2;
+        nextY += vY * deltaTime;
+        break;
+      case 1:
+        nextX += vX * deltaTime + this.size;
+        nextY += this.size / 2;
+        break;
+      case 2:
+        nextX += this.size / 2;
+        nextY += vY * deltaTime + this.size;
+        break;
+      case 3:
+        nextX += vX * deltaTime;
+        nextY += this.size / 2;
+        break;
+    }
+    return StageUtil.getMapIndex(nextX, nextY);
+  }
+  protected stay(): void {
+    this.setVelocity(0, 0);
+
+    switch (this.direction) {
+      case 0:
+        this.animTurnUp();
+        break;
+      case 1:
+        this.animTurnLeft();
+        break;
+      case 2:
+        this.animTurnDown();
+        break;
+      case 3:
+        this.animTurnLeft();
+        break;
+    }
   }
 
   //アニメーションを設定するメソッド
