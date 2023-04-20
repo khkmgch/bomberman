@@ -86,6 +86,7 @@ export class GrassStage extends GenericStage {
 
     //mapに追加
     map[i][j] = {
+      ...map[i][j],
       entity: null,
       item: null,
     };
@@ -108,6 +109,7 @@ export class GrassStage extends GenericStage {
 
     //mapに追加
     map[i][j] = {
+      ...map[i][j],
       entity: edgeObstacle,
       item: null,
     };
@@ -131,6 +133,7 @@ export class GrassStage extends GenericStage {
 
     //mapに追加
     map[i][j] = {
+      ...map[i][j],
       entity: fixedObstacle,
       item: null,
     };
@@ -152,6 +155,7 @@ export class GrassStage extends GenericStage {
 
     //mapに追加
     map[i][j] = {
+      ...map[i][j],
       entity: breakableObstacle,
       item: null,
     };

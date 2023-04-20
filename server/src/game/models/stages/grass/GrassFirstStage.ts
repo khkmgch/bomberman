@@ -19,6 +19,7 @@ export class GrassFirstStage extends GrassStage implements IFirstStage {
     this.setRows(Constant.TILE.ROWS);
     this.setCols(Constant.TILE.COLS);
     this.initMap();
+    this.initImpactMaps();
     this.addPlayers();
     this.addNpcs();
   }
@@ -28,6 +29,11 @@ export class GrassFirstStage extends GrassStage implements IFirstStage {
     for (let i = 0; i < this.cols; i++) {
       map[i] = new Array<Cell>(this.rows);
       for (let j = 0; j < this.rows; j++) {
+        map[i][j] = {
+          index: { i, j },
+          entity: null,
+          item: null,
+        };
         if (i === 0 || i === this.cols - 1 || j === 0 || j === this.rows - 1) {
           this.addEdgeObstacle(map, i, j);
           continue;
