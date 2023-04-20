@@ -8,6 +8,7 @@ import {
 } from '@nestjs/websockets';
 import { iif } from 'rxjs';
 import { Server, Socket } from 'socket.io';
+import { CharacterDTO } from 'src/game/dtos/CharacterDTO';
 import { RoomDTO } from 'src/game/dtos/RoomDTO';
 import { Game } from 'src/game/models/Game';
 import { Room } from 'src/game/models/Room';
@@ -192,7 +193,21 @@ export class EventsGateway {
   }
 
   @SubscribeMessage('PutBomb')
-  putBomb(@ConnectedSocket() socket: Socket) {
+  putBomb(@ConnectedSocket() socket: Socket): void {
     this.roomService.putBomb(socket);
+  }
+
+  @SubscribeMessage('GetResult')
+  getResult(@ConnectedSocket() socket: Socket): {
+    result: CharacterDTO[];
+  } {
+    return this.roomService.getResult(socket);
+  }
+
+  @SubscribeMessage('LeaveResult')
+  leaveResult(@ConnectedSocket() socket: Socket): {
+    success: boolean;
+  } {
+    return this.roomService.leaveResult(socket);
   }
 }

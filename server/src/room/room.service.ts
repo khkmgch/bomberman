@@ -8,6 +8,9 @@ import { Game } from 'src/game/models/Game';
 
 import { Room } from '../game/models/Room';
 import { User } from '../game/models/User';
+import { Character } from 'src/game/models/objects/character/Character';
+import { IStage } from 'src/game/interfaces/stage/IStage';
+import { CharacterDTO } from 'src/game/dtos/CharacterDTO';
 
 @Injectable()
 export class RoomService {
@@ -407,6 +410,70 @@ export class RoomService {
       } else {
         throw new Error('User not found');
       }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  getResult(socket: Socket): {
+    result: CharacterDTO[];
+  } {
+    try {
+      if (this.userExists(socket.roomId, socket.id)) {
+        console.log('User exists');
+        const room: Room = this.getRoomMap().get(socket.roomId);
+        const game: Game = room.getGame();
+        if (game) {
+          console.log('Game exists');
+          const stage: IStage = game.getStage();
+          if (stage) {
+            console.log('Stage exists');
+            const rankingMap: Map<number, Character> = stage
+              .getRankingManager()
+              .getMap();
+            console.log('rankingMap.size : ', rankingMap.size);
+            if (rankingMap.size >= Constant.MAX_PLAYERS_PER_ROOM) {
+              let arr: CharacterDTO[] = [];
+              for (let i = 1; i <= Constant.MAX_PLAYERS_PER_ROOM; i++) {
+                if (!rankingMap.has(i)) continue;
+                arr.push(rankingMap.get(i).toDTO());
+              }
+              console.log('arr : ', arr);
+              return { result: arr };
+            } else {
+              throw new Error('Ranking not ready');
+            }
+          } else {
+            throw new Error('Stage not found');
+          }
+        } else {
+          throw new Error('Game not found');
+        }
+      } else {
+        throw new Error('User not found');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  leaveResult(socket: Socket): {
+    success: boolean;
+  } {
+    try {
+      //ルームがない場合
+      if (!this.roomExists(socket.roomId)) return { success: false };
+
+      const room = this.roomMap.get(socket.roomId);
+      //ルームが削除中の場合
+      if (room.getIsRemoving()) return { success: false };
+
+      //ユーザーが存在しない場合
+      if (!room.hasUser(socket.id)) return { success: false };
+
+      //ユーザーを削除
+      this.removeUser(socket, socket.roomId);
+      return { success: true };
     } catch (error) {
       console.error(error);
     }
