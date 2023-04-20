@@ -5,6 +5,7 @@ import Constant from '../../../server/src/constant';
 import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import Lobby from '../scenes/Lobby';
 import Game from '../scenes/Game';
+import Result from '../scenes/Result';
 const gameConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   scale: {
@@ -26,7 +27,7 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
     roundPixels: true,
   },
   backgroundColor: Constant.COLOR_STRING.WHITE,
-  scene: [Preloader, Title, Lobby, Game],
+  scene: [Preloader, Title, Lobby, Game, Result],
   plugins: {
     scene: [
       {
