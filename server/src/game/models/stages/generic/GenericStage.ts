@@ -15,11 +15,19 @@ import { ExplosionManager } from '../../managers/ExplosionManager';
 import { FixedObstacleManager } from '../../managers/FixedObstacleManager';
 import { GroundManager } from '../../managers/GroundManager';
 import { MarkerManager } from '../../managers/MarkerManager';
-import { GameObject } from '../../objects/GameObject';
 import { Npc } from '../../objects/character/Npc';
 import { Player } from '../../objects/character/Player';
 import { ItemManager } from '../../managers/ItemManager';
 import { Cell } from 'src/game/types/Cell';
+import { Item } from '../../objects/item/Item';
+import { NpcUtil } from 'src/game/utils/NpcUtil';
+import { Index } from 'src/game/types/Index';
+import { Marker } from '../../objects/attack/Marker';
+import { Bomb } from '../../objects/attack/Bomb';
+import { BreakableObstacle } from '../../objects/map/obstacle/BreakableObstacle';
+import { Explosion } from '../../objects/attack/Explosion';
+import { Character } from '../../objects/character/Character';
+import { RankingManager } from '../../managers/rankingManager';
 
 // ステージの汎用クラス
 export class GenericStage implements IStage {
@@ -40,6 +48,12 @@ export class GenericStage implements IStage {
   protected markerManager: MarkerManager = new MarkerManager();
   protected explosionManager: ExplosionManager = new ExplosionManager();
   protected itemManager: ItemManager = new ItemManager();
+
+  protected impactMaps: { item: number[][]; explosion: number[][] } = {
+    item: [],
+    explosion: [],
+  };
+  protected rankingManager: RankingManager = new RankingManager();
 
   constructor(
     protected type: string,
@@ -191,6 +205,16 @@ export class GenericStage implements IStage {
     return { x: i * this.tileSize, y: j * this.tileSize };
   }
 
+  public getImpactMapWithItem(): number[][] {
+    return this.impactMaps.item;
+  }
+  public getImpactMapWithExplosion(): number[][] {
+    return this.impactMaps.explosion;
+  }
+  public getRankingManager(): RankingManager {
+    return this.rankingManager;
+  }
+
   /* setter - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
   protected setTileSize(tileSize: number): void {
@@ -210,12 +234,20 @@ export class GenericStage implements IStage {
 
   public update(deltaTime: number): void {
     this.updatePlayers(deltaTime);
+    this.updateNpcs(deltaTime);
   }
 
   public updatePlayers(deltaTime: number): void {
     this.playerMap.forEach((player: Player) => {
       if (player.getIsAlive()) {
-        player.update(deltaTime, this);
+        player.update(deltaTime);
+      }
+    });
+  }
+  private updateNpcs(deltaTime: number): void {
+    this.npcMap.forEach((npc: Npc) => {
+      if (npc.getIsAlive()) {
+        npc.update(deltaTime);
       }
     });
   }
@@ -232,5 +264,121 @@ export class GenericStage implements IStage {
     return (
       0 <= id && id <= Constant.MAX_PLAYERS_PER_ROOM && this.playerMap.has(id)
     );
+  }
+  public isGameOver(): boolean {
+    if (this.rankingManager.getMap().size >= Constant.MAX_PLAYERS_PER_ROOM - 1)
+      return true;
+    else {
+      let res: boolean = true;
+      this.playerMap.forEach((player: Player) => {
+        if (player.getIsAlive()) res = false;
+      });
+      return res;
+    }
+  }
+  public rankCharacters(): void {
+    if (this.rankingManager.getMap().size >= Constant.MAX_PLAYERS_PER_ROOM)
+      return;
+    else {
+      let arr: Character[] = [];
+      this.playerMap.forEach((player: Player) => {
+        if (player.getIsAlive()) arr.push(player);
+      });
+      this.npcMap.forEach((npc: Npc) => {
+        if (npc.getIsAlive()) arr.push(npc);
+      });
+      arr.sort((a: Character, b: Character) => a.getStock() - b.getStock());
+
+      arr.forEach((character: Character) => {
+        this.rankingManager
+          .getMap()
+          .set(this.rankingManager.getCurrId(), character);
+        this.rankingManager.decrementCurrId();
+      });
+    }
+  }
+
+  protected initImpactMaps(): void {
+    this.impactMaps = {
+      item: this.createImpactMap(),
+      explosion: this.createImpactMap(),
+    };
+  }
+  private createImpactMap(): number[][] {
+    let impactMap: number[][] = Array.from({ length: this.cols }, () =>
+      Array.from({ length: this.rows }, () => Infinity),
+    );
+    this.map.forEach((cellArr: Cell[]) => {
+      cellArr.forEach((cell: Cell) => {
+        if (cell.entity === null) {
+          const { i, j }: Index = cell.index;
+          impactMap[i][j] = 0;
+        }
+      });
+    });
+    return impactMap;
+  }
+
+  public updateImpactMapWithItem(): void {
+    const itemMap: Map<number, Item> = this.itemManager.getMap();
+    const impactMaps: Map<number, number[][]> = new Map<number, number[][]>();
+    itemMap.forEach((item: Item, key: number) => {
+      const { i, j }: Index = item.getIndex();
+      const cell: Cell = this.map[i][j];
+      impactMaps.set(key, NpcUtil.createImpactMap(cell, this.map));
+    });
+    const impactMap: number[][] = Array.from({ length: this.cols }, () =>
+      Array.from({ length: this.rows }, () => Infinity),
+    );
+    for (let i = 0; i < impactMap.length; i++) {
+      for (let j = 0; j < impactMap[i].length; j++) {
+        let currValue: number = impactMap[i][j];
+        impactMaps.forEach((currMap: number[][]) => {
+          const value: number = currMap[i][j];
+          if (value === Infinity) return;
+          else if (currValue === Infinity || value < currValue) {
+            currValue = value;
+          }
+        });
+        impactMap[i][j] = currValue;
+      }
+    }
+
+    this.impactMaps.item = impactMap;
+    // console.log('impactMapByItem', this.impactMap.item);
+  }
+  public updateImpactMapWithExplosion(): void {
+    const bombMap = this.bombManager.getMap();
+    const markerMap: Map<number, Marker> = this.markerManager.getMap();
+    const explosionMap: Map<number, Explosion> = this.explosionManager.getMap();
+    const impactMap: number[][] = Array.from({ length: this.cols }, () =>
+      Array.from({ length: this.rows }, () => Infinity),
+    );
+
+    for (let i = 1; i < this.map.length - 1; i++) {
+      for (let j = 1; j < this.map[i].length - 1; j++) {
+        if (i % 2 === 0 && j % 2 === 0) continue;
+        const cell: Cell = this.map[i][j];
+        if (cell.entity instanceof BreakableObstacle) {
+          continue;
+        }
+        const { i: currI, j: currJ }: Index = cell.index;
+        impactMap[currI][currJ] = 0;
+      }
+    }
+    bombMap.forEach((bomb: Bomb) => {
+      const { i, j }: Index = bomb.getIndex();
+      impactMap[i][j] = 1;
+    });
+    markerMap.forEach((marker: Marker) => {
+      const { i, j }: Index = marker.getIndex();
+      impactMap[i][j] = 1;
+    });
+    explosionMap.forEach((explosion: Explosion) => {
+      const { i, j }: Index = explosion.getIndex();
+      impactMap[i][j] = 1;
+    });
+    this.impactMaps.explosion = impactMap;
+    // console.log('this.impactMap.explosion : ', this.impactMap.explosion);
   }
 }
