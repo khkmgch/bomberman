@@ -125,6 +125,24 @@ export default class TitleUtil {
       .setScale(0.8);
     scene.add.image(x + 150, y + 140, Constant.SPACE).setScale(0.7);
   }
+  static createItemUsage(scene: Scene, x: number, y: number) {
+    Object.entries(Constant.ITEM).forEach(([key, value]) => {
+      scene.rexUI.add.container(0, 0, 250, 60, [
+        scene.add.image(x, y, value).setScale(0.7).setOrigin(0.3),
+        scene.add.text(
+          x + 40,
+          y,
+          `: ${key.charAt(0)}${key.slice(1).toLowerCase()}Up`,
+          {
+            fontFamily: 'PressStart2P',
+            fontSize: '18px',
+            color: Constant.COLOR_STRING.CHARCOAL_GRAY,
+          }
+        ),
+      ]);
+      y = y + 60;
+    });
+  }
 
   static createGitHubBtn(scene: Scene, x: number, y: number) {
     return scene.rexUI.add

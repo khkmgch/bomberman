@@ -18,17 +18,7 @@ import { Item } from '../item/Item';
 import { Cell } from 'src/game/types/Cell';
 
 export class Bomb extends GameObject {
-  private marker: {
-    top: Marker[];
-    right: Marker[];
-    down: Marker[];
-    left: Marker[];
-  } = {
-    top: [],
-    right: [],
-    down: [],
-    left: [],
-  };
+  private markers: Marker[] = [];
   private explosionMap: Map<number, Explosion> = new Map<number, Explosion>();
 
   constructor(
@@ -63,25 +53,15 @@ export class Bomb extends GameObject {
   private getMarkerDTOs() {
     const markerDTOs: MarkerDTO[] = [];
 
-    for (const direction in this.marker) {
-      if (Object.prototype.hasOwnProperty.call(this.marker, direction)) {
-        const markers: Marker[] = this.marker[direction];
-        for (const marker of markers) {
-          markerDTOs.push(marker.toDTO());
-        }
-      }
+    for (const marker of this.markers) {
+      markerDTOs.push(marker.toDTO());
     }
     return markerDTOs;
   }
   private getMarkerIds(): number[] {
     const ids: number[] = [];
-    for (const direction in this.marker) {
-      if (Object.prototype.hasOwnProperty.call(this.marker, direction)) {
-        const markers: Marker[] = this.marker[direction];
-        for (const marker of markers) {
-          ids.push(marker.getId());
-        }
-      }
+    for (const marker of this.markers) {
+      ids.push(marker.getId());
     }
     return ids;
   }
@@ -138,16 +118,24 @@ export class Bomb extends GameObject {
     //markerManagerに追加
     markerManager.getMap().set(id, marker);
     //配列にpush
-    this.marker.top.push(marker);
+    // this.marker.top.push(marker);
+    this.markers.push(marker);
   }
   private explode() {
     const bombMap: Map<number, Bomb> = this.character.getBombMap();
     const bombManager: BombManager = this.stage.getBombManager();
+    const markerManager: MarkerManager = this.stage.getMarkerManager();
 
     if (!(bombMap.has(this.id) && bombManager.getMap().has(this.id))) return;
 
     bombMap.delete(this.id);
     bombManager.getMap().delete(this.id);
+
+    this.markers.forEach((marker: Marker) => {
+      if (markerManager.getMap().has(marker.getId())) {
+        markerManager.getMap().delete(marker.getId());
+      }
+    });
 
     const { i, j }: Index = this.getIndex();
     this.stage.getMap()[i][j].entity = null;
@@ -167,6 +155,7 @@ export class Bomb extends GameObject {
       .getEventGateway()
       .server.in(this.stage.getRoomId())
       .emit('AddExplosions', { explosionArr: this.getExplosionDTOs() });
+
     setTimeout(() => {
       const explosionIds: number[] = this.getExplosionIds();
       this.removeExplosions();
@@ -174,6 +163,7 @@ export class Bomb extends GameObject {
         .getEventGateway()
         .server.in(this.stage.getRoomId())
         .emit('RemoveExplosions', { idArr: explosionIds });
+      this.stage.updateImpactMapWithExplosion();
     }, 1000);
   }
   private addExplosions(): void {
@@ -182,15 +172,10 @@ export class Bomb extends GameObject {
     const { i, j }: Index = this.getIndex();
     this.addExplosion(x, y, i, j);
     //爆弾の周辺
-    for (const direction in this.marker) {
-      if (Object.prototype.hasOwnProperty.call(this.marker, direction)) {
-        const markers: Marker[] = this.marker[direction];
-        for (const marker of markers) {
-          const { x, y }: Position = marker.getPosition();
-          const { i, j }: Index = marker.getIndex();
-          this.addExplosion(x, y, i, j);
-        }
-      }
+    for (const marker of this.markers) {
+      const { x, y }: Position = marker.getPosition();
+      const { i, j }: Index = marker.getIndex();
+      this.addExplosion(x, y, i, j);
     }
   }
   private addExplosion(x: number, y: number, i: number, j: number): void {
@@ -213,7 +198,14 @@ export class Bomb extends GameObject {
     if (cell.entity instanceof BreakableObstacle) {
       const breakableObstacle: BreakableObstacle = cell.entity;
 
-      map[i][j].entity = null;
+      map[i][j].entity = explosion;
+
+      const breakableObstacleMap: Map<number, BreakableObstacle> = this.stage
+        .getBreakableObstacleManager()
+        .getMap();
+      if (breakableObstacleMap.has(breakableObstacle.getId())) {
+        breakableObstacleMap.delete(breakableObstacle.getId());
+      }
 
       this.stage
         .getEventGateway()
@@ -228,11 +220,14 @@ export class Bomb extends GameObject {
           .getEventGateway()
           .server.in(this.stage.getRoomId())
           .emit('AddItem', { item: item.toDTO() });
+
+        //アイテムの影響マップを更新
+        this.stage.updateImpactMapWithItem();
       }
     } else {
       map[i][j].entity = explosion;
     }
-    // explosionManager.getMap().set(id, explosion);
+    explosionManager.getMap().set(id, explosion);
     this.explosionMap.set(id, explosion);
   }
   private getExplosionDTOs(): ExplosionDTO[] {
@@ -264,6 +259,10 @@ export class Bomb extends GameObject {
     }
     if (this.explosionMap.has(explosion.getId())) {
       this.explosionMap.delete(explosion.getId());
+    }
+    const explosionManager: ExplosionManager = this.stage.getExplosionManager();
+    if (explosionManager.getMap().has(explosion.getId())) {
+      explosionManager.getMap().delete(explosion.getId());
     }
   }
 }

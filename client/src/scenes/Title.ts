@@ -38,6 +38,8 @@ export default class Title extends Scene {
     //Bomb
     TitleUtil.createBombUsage(this, centerX - 440, centerY + 150);
 
+    TitleUtil.createItemUsage(this, centerX + 200, centerY + 150);
+
     //GitHub Button
     TitleUtil.createGitHubBtn(this, centerX, centerY + 420);
 

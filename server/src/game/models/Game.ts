@@ -3,6 +3,8 @@ import { EventsGateway } from 'src/events/events.gateway';
 import { GrassStageFactory } from '../factories/stage/GrassStageFactory';
 import { IStageFactory } from '../interfaces/factory/IStageFactory';
 import { IStage } from '../interfaces/stage/IStage';
+import { Player } from './objects/character/Player';
+import { Npc } from './objects/character/Npc';
 
 export class Game {
   private stageFactory: IStageFactory;
@@ -71,6 +73,16 @@ export class Game {
       }
 
       if (this.stage === null) return;
+
+      if (this.stage.isGameOver()) {
+        this.stage.rankCharacters();
+        clearInterval(interval);
+        setTimeout(() => {
+          //Finishedを表示
+          //リザルト画面に遷移
+          this.eventsGateway.server.in(this.roomId).emit('Finished');
+        }, 1000);
+      }
       //経過時間の算出
 
       //ミリ秒

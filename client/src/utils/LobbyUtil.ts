@@ -140,7 +140,7 @@ export default class LobbyUtil {
     y: number,
     rooms: IRoomDTO[]
   ) {
-    var gridTable = scene.rexUI.add
+    let gridTable = scene.rexUI.add
       .gridTable({
         x: x,
         y: y,

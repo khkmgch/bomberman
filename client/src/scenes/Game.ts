@@ -65,8 +65,7 @@ export default class Game extends Scene {
       this.inputManager = new InputManager(this, this.socket);
     }
 
-    console.log('game scene started');
-    // this.addSocketListeners();
+    // console.log('game scene started');
   }
   public create() {
     if (!this.socket) return;
@@ -132,8 +131,27 @@ export default class Game extends Scene {
     this.onDamaged();
     this.onDead();
     this.onSyncItems();
+    this.onFinished();
   }
-  private removeSocketListeners(): void {}
+  private removeSocketListeners(): void {
+    this.offGetInitialState();
+    this.offSyncState();
+    this.offSyncTime();
+    this.offAddBomb();
+    this.offRemoveBomb();
+    this.offAddMarkers();
+    this.offRemoveMarkers();
+    this.offAddExplosions();
+    this.offRemoveExplosions();
+    this.offRemoveBreakObstacle();
+    this.offAddItem();
+    this.offRemoveItem();
+    this.offDamaged();
+    this.offDead();
+    this.offSyncItems();
+    this.offCountDown();
+    this.offFinished();
+  }
 
   private onGetInitialState(): void {
     this.socket.on(
@@ -153,6 +171,10 @@ export default class Game extends Scene {
             SyncUtil.addBreakableObstacles(data.breakableObstacleArr, this);
             SyncUtil.addCharacters(data.characterArr, this);
           } else {
+            alert(
+              'Failed to receive game information. Please reload the page and return to the title screen.'
+            );
+            location.reload();
             throw new Error('Invalid data format');
           }
         } catch (error) {
@@ -161,11 +183,17 @@ export default class Game extends Scene {
       }
     );
   }
+  private offGetInitialState(): void {
+    this.socket.off('GetInitialState');
+  }
   private onSyncState(): void {
     this.socket.on('SyncState', (data: { characterArr: ICharacterDTO[] }) => {
       SyncUtil.addCharacters(data.characterArr, this);
       SyncUtil.updateCharacter(this);
     });
+  }
+  private offSyncState(): void {
+    this.socket.off('SyncState');
   }
   private onSyncTime(): void {
     this.socket.on('SyncTime', (data: { timeStr: string }) => {
@@ -177,6 +205,9 @@ export default class Game extends Scene {
         console.error(error);
       }
     });
+  }
+  private offSyncTime(): void {
+    this.socket.off('SyncTime');
   }
   private onAddBomb(): void {
     this.socket.on('AddBomb', (data: { bomb: IBombDTO }) => {
@@ -191,6 +222,9 @@ export default class Game extends Scene {
       }
     });
   }
+  private offAddBomb(): void {
+    this.socket.off('AddBomb');
+  }
   private onRemoveBomb(): void {
     this.socket.on('RemoveBomb', (data: { id: number }) => {
       try {
@@ -203,6 +237,9 @@ export default class Game extends Scene {
         console.error(error);
       }
     });
+  }
+  private offRemoveBomb(): void {
+    this.socket.off('RemoveBomb');
   }
   private onAddMarkers(): void {
     this.socket.on('AddMarkers', (data: { markerArr: IMarkerDTO[] }) => {
@@ -217,6 +254,9 @@ export default class Game extends Scene {
       }
     });
   }
+  private offAddMarkers(): void {
+    this.socket.off('AddMarkers');
+  }
   private onRemoveMarkers(): void {
     this.socket.on('RemoveMarkers', (data: { idArr: number[] }) => {
       try {
@@ -229,6 +269,9 @@ export default class Game extends Scene {
         console.error(error);
       }
     });
+  }
+  private offRemoveMarkers(): void {
+    this.socket.off('RemoveMarkers');
   }
   private onAddExplosions(): void {
     this.socket.on(
@@ -246,6 +289,9 @@ export default class Game extends Scene {
       }
     );
   }
+  private offAddExplosions(): void {
+    this.socket.off('AddExplosions');
+  }
   private onRemoveExplosions(): void {
     this.socket.on('RemoveExplosions', (data: { idArr: number[] }) => {
       try {
@@ -258,6 +304,9 @@ export default class Game extends Scene {
         console.error(error);
       }
     });
+  }
+  private offRemoveExplosions(): void {
+    this.socket.off('RemoveExplosions');
   }
   private onRemoveBreakableObstacle(): void {
     this.socket.on('RemoveBreakableObstacle', (data: { id: number }) => {
@@ -272,6 +321,9 @@ export default class Game extends Scene {
       }
     });
   }
+  private offRemoveBreakObstacle(): void {
+    this.socket.off('RemoveBreakableObstacle');
+  }
   private onAddItem(): void {
     this.socket.on('AddItem', (data: { item: IItemDTO }) => {
       try {
@@ -284,6 +336,9 @@ export default class Game extends Scene {
         console.error(error);
       }
     });
+  }
+  private offAddItem(): void {
+    this.socket.off('AddItem');
   }
   private onRemoveItem(): void {
     this.socket.on('RemoveItem', (data: { id: number }) => {
@@ -298,6 +353,9 @@ export default class Game extends Scene {
       }
     });
   }
+  private offRemoveItem(): void {
+    this.socket.off('RemoveItem');
+  }
   private onDamaged(): void {
     this.socket.on('Damaged', (data: { id: number }) => {
       try {
@@ -311,6 +369,9 @@ export default class Game extends Scene {
       }
     });
   }
+  private offDamaged(): void {
+    this.socket.off('Damaged');
+  }
   private onDead(): void {
     this.socket.on('Dead', (data: { id: number }) => {
       try {
@@ -323,6 +384,9 @@ export default class Game extends Scene {
         console.error(error);
       }
     });
+  }
+  private offDead(): void {
+    this.socket.off('Dead');
   }
   private onSyncItems(): void {
     this.socket.on('SyncItems', (data: { items: ISyncItemsDTO }) => {
@@ -338,6 +402,9 @@ export default class Game extends Scene {
         console.error(error);
       }
     });
+  }
+  private offSyncItems(): void {
+    this.socket.off('SyncItems');
   }
   private onCountDown(): void {
     this.socket.on('CountDown', (data: { countDown: number }) => {
@@ -356,5 +423,40 @@ export default class Game extends Scene {
         console.error(error);
       }
     });
+  }
+  private offCountDown(): void {
+    this.socket.off('CountDown');
+  }
+  private onFinished(): void {
+    this.socket.on('Finished', () => {
+      this.add
+        .text(this.centerX, this.centerY, 'Finished', {
+          fontSize: '116px',
+          color: Constant.COLOR_STRING.POWDER_PINK,
+          fontFamily: 'PressStart2P',
+        })
+        .setStroke(Constant.COLOR_STRING.LOTUS_PINK, 10)
+        .setShadow(5, 5, Constant.COLOR_STRING.CHARCOAL_GRAY, 0, true, true)
+        .setOrigin(0.5);
+
+      setTimeout(() => {
+        this.removeSocketListeners();
+        this.scene.start(Constant.SCENE.RESULT, {
+          socket: this.socket,
+        });
+        this.shutdown();
+        this.scene.stop(Constant.SCENE.GAME);
+      }, 5000);
+    });
+  }
+  private offFinished(): void {
+    this.socket.off('Finished');
+  }
+
+  /* others - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+  private shutdown() {
+    // オブジェクトの削除
+    this.children.removeAll(true);
   }
 }

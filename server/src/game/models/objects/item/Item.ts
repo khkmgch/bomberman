@@ -29,5 +29,8 @@ export class Item extends GameObject {
       .getEventGateway()
       .server.in(stage.getRoomId())
       .emit('RemoveItem', { id: this.id });
+
+    //アイテムの影響マップを更新
+    stage.updateImpactMapWithItem();
   }
 }

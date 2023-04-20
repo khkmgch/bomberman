@@ -17,6 +17,8 @@ import { MarkerManager } from 'src/game/models/managers/MarkerManager';
 import { ExplosionManager } from 'src/game/models/managers/ExplosionManager';
 import { ItemManager } from 'src/game/models/managers/ItemManager';
 import { Cell } from 'src/game/types/Cell';
+import { Character } from 'src/game/models/objects/character/Character';
+import { RankingManager } from 'src/game/models/managers/rankingManager';
 
 // ステージインターフェース
 export interface IStage {
@@ -51,6 +53,12 @@ export interface IStage {
     characterArr: CharacterDTO[];
   };
 
+  getImpactMapWithItem(): number[][];
+
+  getImpactMapWithExplosion(): number[][];
+
+  getRankingManager(): RankingManager;
+
   update(deltaTime: number): void;
 
   playerPutBomb(playerId: number): void;
@@ -58,4 +66,12 @@ export interface IStage {
   movePlayer(id: number, movement: Movement): void;
 
   playerExists(id: number): boolean;
+
+  updateImpactMapWithItem(): void;
+
+  updateImpactMapWithExplosion(): void;
+
+  isGameOver(): boolean;
+
+  rankCharacters(): void;
 }
