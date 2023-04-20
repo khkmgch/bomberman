@@ -4,6 +4,7 @@ export default class Constant {
     TITLE: 'Title',
     LOBBY: 'Lobby',
     GAME: 'Game',
+    RESULT: 'Result',
   };
 
   static readonly MAX_PLAYERS_PER_ROOM = 4;
@@ -82,9 +83,9 @@ export default class Constant {
     MARKER: 'cat_paw',
   };
   static readonly ITEM = {
-    SPEED: 'speed_up',
-    FIRE: 'fire_up',
     BOMB: 'bomb_up',
+    FIRE: 'fire_up',
+    SPEED: 'speed_up',
     HEAL: 'heal_up',
   };
 
@@ -116,6 +117,12 @@ export default class Constant {
   static readonly NO_ROOM_TEXT = 'No Rooms ... ';
 
   /* AIアルゴリズム - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+  static readonly ACTION = {
+    GET_ITEM: 'GET_ITEM',
+    ATTACK_CHARACTER: 'ATTACK_CHARACTER',
+    BREAK_OBSTACLE: 'BREAK_OBSTACLE',
+  };
   static readonly IMPACT_MAP_WEIGHT_COEFFICIENT = {
     GET_ITEM: {
       ITEM: 0.5,
