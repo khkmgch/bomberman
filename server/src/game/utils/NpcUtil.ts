@@ -1,11 +1,6 @@
-import { IStage } from '../interfaces/stage/IStage';
 import { PriorityQueue } from '../libs/PriorityQueue/PriorityQueue';
 import { HeapNode } from '../libs/PriorityQueue/types/HeapNode';
 import { Bomb } from '../models/objects/attack/Bomb';
-import { Character } from '../models/objects/character/Character';
-import { Npc } from '../models/objects/character/Npc';
-import { Player } from '../models/objects/character/Player';
-import { Item } from '../models/objects/item/Item';
 import { BreakableObstacle } from '../models/objects/map/obstacle/BreakableObstacle';
 import { EdgeObstacle } from '../models/objects/map/obstacle/EdgeObstacle';
 import { FixedObstacle } from '../models/objects/map/obstacle/FixedObstacle';

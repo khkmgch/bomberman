@@ -26,13 +26,13 @@ export default class Lobby extends Scene {
   constructor() {
     super(Constant.SCENE.LOBBY);
   }
-  public init(data: { socket: Socket }) {
+  public init(data: { socket: Socket }): void {
     this.setSocket(data.socket);
 
     this.addSocketListeners();
   }
 
-  public create() {
+  public create(): void {
     const { centerX, centerY } = this.cameras.main;
 
     const { width, height } = this.sys.canvas;
@@ -203,7 +203,7 @@ export default class Lobby extends Scene {
 
   /* others - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-  private shutdown() {
+  private shutdown(): void {
     // イベントリスナーの解除
     this.events.off('create_room', this.createRoom, this);
     this.events.off('start_game', this.startGame, this);
@@ -227,7 +227,7 @@ export default class Lobby extends Scene {
     this.getTableOfRooms().refresh();
   }
 
-  private createRoom() {
+  private createRoom(): void {
     this.socket.emit(
       'CreateRoom',
       { userName: this.getNameInput().text },
@@ -245,11 +245,11 @@ export default class Lobby extends Scene {
     );
   }
   //対戦ルームに入室したことをルーム内の全ユーザーに知らせるためのメソッド
-  private notifyRoomJoin() {
+  private notifyRoomJoin(): void {
     this.socket.emit('NotifyRoomJoin', { roomId: this.socket.roomId });
   }
   //ルーム内のユーザーを取得し、プレイヤーのパネルをセットするメソッド
-  private getRoomUsers() {
+  private getRoomUsers(): void {
     this.socket.emit(
       'GetRoomUsers',
       { roomId: this.socket.roomId },
@@ -262,7 +262,7 @@ export default class Lobby extends Scene {
       }
     );
   }
-  private joinRoom(id: string, userName: string) {
+  private joinRoom(id: string, userName: string): void {
     this.socket.emit(
       'JoinRoom',
       {
@@ -314,7 +314,7 @@ export default class Lobby extends Scene {
     );
   }
 
-  private leaveRoom(scene: Lobby) {
+  private leaveRoom(scene: Lobby): void {
     scene.socket.emit(
       'LeaveRoom',
       { roomId: scene.socket.roomId },
@@ -332,15 +332,15 @@ export default class Lobby extends Scene {
     );
   }
   //ゲーム開始できるように、プレイヤーの状態をWATINGからREADYに変更するメソッド
-  private readyToStartGame(scene: Lobby) {
+  private readyToStartGame(scene: Lobby): void {
     scene.socket.emit('ReadyToStartGame');
   }
 
-  private startGame() {
+  private startGame(): void {
     this.socket.emit(
       'CheckAllPlayersReady',
       (response: { isReady: boolean }) => {
-        console.log(response);
+        // console.log(response);
         try {
           if (Guards.isCheckAllPlayersReadyDTO(response)) {
             if (response.isReady) {
@@ -358,7 +358,7 @@ export default class Lobby extends Scene {
     );
   }
 
-  private closeRoomDialog(scene: Lobby) {
+  private closeRoomDialog(scene: Lobby): void {
     scene.socket.roomId = '';
     //ルームダイアログを閉じる
     scene.getRoomDialog()?.scaleDownDestroy(100);
@@ -372,7 +372,7 @@ export default class Lobby extends Scene {
     scene.enableButtons();
   }
 
-  private upsertPlayerPanel(player: IUserDTO) {
+  private upsertPlayerPanel(player: IUserDTO): void {
     const dialog: Dialog | null = this.getRoomDialog();
     if (dialog !== null) {
       const dialogContent: GridSizer = dialog.getElement(
@@ -424,12 +424,18 @@ export default class Lobby extends Scene {
       }, 200);
     }
   }
-  private removePlayerPanel(player: IUserDTO) {
-    const dialog = this.getRoomDialog();
+  private removePlayerPanel(player: IUserDTO): void {
+    const dialog: Dialog | null = this.getRoomDialog();
     if (dialog !== null) {
-      const dialogContent = dialog.getElement('content') as GridSizer;
-      const playerPanel = dialogContent.getChildren().at(player.id) as Label;
-      const icon = playerPanel.getElement('icon') as ContainerLite;
+      const dialogContent: GridSizer = dialog.getElement(
+        'content'
+      ) as GridSizer;
+      const playerPanel: Label = dialogContent
+        .getChildren()
+        .at(player.id) as Label;
+      const icon: ContainerLite = playerPanel.getElement(
+        'icon'
+      ) as ContainerLite;
       icon.getChildren().forEach((child: any, i: number) => {
         if (i === 0) {
           child.setFillStyle(Constant.COLOR_NUMBER.MIST);
@@ -442,40 +448,52 @@ export default class Lobby extends Scene {
     }
   }
 
-  private hasRoom(index: number) {
+  private hasRoom(index: number): boolean {
     return this.getRooms() && 0 <= index && index < this.getRooms().length;
   }
 
-  private diableButtons() {
+  private diableButtons(): void {
     this.getNewRoomBtn().setButtonEnable(false);
     this.tableOfRooms.off('cell.click', this.mouseClickRoom, this);
     this.tableOfRooms.off('cell.over', this.mouseHoverRoom, this);
     this.tableOfRooms.off('cell.out', this.mouseOutRoom, this);
   }
-  private enableButtons() {
+  private enableButtons(): void {
     this.getNewRoomBtn().setButtonEnable(true);
     this.tableOfRooms.on('cell.click', this.mouseClickRoom, this);
     this.tableOfRooms.on('cell.over', this.mouseHoverRoom, this);
     this.tableOfRooms.on('cell.out', this.mouseOutRoom, this);
   }
 
-  private mouseClickRoom(cellContainer: any, cellIndex: number, pointer: any) {
+  private mouseClickRoom(
+    cellContainer: any,
+    cellIndex: number,
+    pointer: any
+  ): void {
     if (cellContainer.getElement('text').text !== Constant.NO_ROOM_TEXT) {
       if (this.hasRoom(cellIndex)) {
-        console.log(this.getRooms()[cellIndex]);
+        // console.log(this.getRooms()[cellIndex]);
         const room = this.getRooms()[cellIndex];
         this.joinRoom(room.id, this.getNameInput().text);
       }
     }
   }
-  private mouseHoverRoom(cellContainer: any, cellIndex: number, pointer: any) {
+  private mouseHoverRoom(
+    cellContainer: any,
+    cellIndex: number,
+    pointer: any
+  ): void {
     if (cellContainer.getElement('text').text !== Constant.NO_ROOM_TEXT)
       cellContainer
         .getElement('background')
         .setStrokeStyle(2, Constant.COLOR_NUMBER.POWDER_PINK)
         .setFillStyle(Constant.COLOR_NUMBER.MIST);
   }
-  private mouseOutRoom(cellContainer: any, cellIndex: number, pointer: any) {
+  private mouseOutRoom(
+    cellContainer: any,
+    cellIndex: number,
+    pointer: any
+  ): void {
     if (cellContainer.getElement('text').text !== Constant.NO_ROOM_TEXT)
       cellContainer
         .getElement('background')

@@ -1,8 +1,11 @@
 import { Scene } from 'phaser';
 import Constant from '../../../server/src/constant';
+import Label from 'phaser3-rex-plugins/templates/ui/label/Label';
+import Buttons from 'phaser3-rex-plugins/templates/ui/buttons/Buttons';
+import TextBox from 'phaser3-rex-plugins/templates/ui/textbox/TextBox';
 
 export default class TitleUtil {
-  static createStartBtn(scene: Scene, x: number, y: number) {
+  static createStartBtn(scene: Scene, x: number, y: number): Buttons {
     return scene.rexUI.add
       .buttons({
         x,
@@ -15,8 +18,8 @@ export default class TitleUtil {
         scene.events.emit('start_lobby');
       });
   }
-  static createStartLabel(scene: Scene) {
-    const label = scene.rexUI.add.label({
+  static createStartLabel(scene: Scene): Label {
+    const label: Label = scene.rexUI.add.label({
       orientation: 'x',
       background: scene.rexUI.add
         .roundRectangle(0, 0, 10, 10, 10, Constant.COLOR_NUMBER.LOTUS_PINK)
@@ -38,7 +41,7 @@ export default class TitleUtil {
     return label;
   }
 
-  static createTitleText(scene: Scene, x: number, y: number) {
+  static createTitleText(scene: Scene, x: number, y: number): void {
     scene.add
       .text(x, y, 'BomberCat ', {
         fontSize: '160px',
@@ -47,15 +50,20 @@ export default class TitleUtil {
       })
       .setStroke(Constant.COLOR_STRING.LOTUS_PINK, 10)
       .setShadow(5, 5, Constant.COLOR_STRING.CHARCOAL_GRAY, 0, true, true);
-    // .setTint(0xf4a460, 0x3cb371, 0xf08080, 0xffe4e1);
   }
-  static createUsageTextBox(scene: Scene, x: number, y: number, config: any) {
-    const GetValue = Phaser.Utils.Objects.GetValue;
-    let wrapWidth = GetValue(config, 'wrapWidth', 0);
-    let fixedWidth = GetValue(config, 'fixedWidth', 0);
-    let fixedHeight = GetValue(config, 'fixedHeight', 0);
+  static createUsageTextBox(
+    scene: Scene,
+    x: number,
+    y: number,
+    config: any
+  ): TextBox {
+    const GetValue: (source: object, key: string, defaultValue: any) => any =
+      Phaser.Utils.Objects.GetValue;
+    let wrapWidth: number = GetValue(config, 'wrapWidth', 0);
+    let fixedWidth: number = GetValue(config, 'fixedWidth', 0);
+    let fixedHeight: number = GetValue(config, 'fixedHeight', 0);
 
-    let textBox = scene.rexUI.add
+    let textBox: TextBox = scene.rexUI.add
       .textBox({
         x: x,
         y: y,
@@ -92,7 +100,7 @@ export default class TitleUtil {
     wrapWidth: number,
     fixedWidth: number,
     fixedHeight: number
-  ) {
+  ): Phaser.GameObjects.Text {
     return scene.add
       .text(0, 0, '- How to Play -', {
         fontFamily: 'PressStart2P',
@@ -107,7 +115,7 @@ export default class TitleUtil {
       .setFixedSize(fixedWidth, fixedHeight);
   }
 
-  static createMoveUsage(scene: Scene, x: number, y: number) {
+  static createMoveUsage(scene: Scene, x: number, y: number): void {
     scene.add.image(x, y, Constant.ARROW.UP).setScale(0.8);
     scene.add.image(x + 70, y + 70, Constant.ARROW.RIGHT).setScale(0.8);
     scene.add.image(x, y + 140, Constant.ARROW.DOWN).setScale(0.8);
@@ -118,14 +126,14 @@ export default class TitleUtil {
       .setScale(1.5);
   }
 
-  static createBombUsage(scene: Scene, x: number, y: number) {
+  static createBombUsage(scene: Scene, x: number, y: number): void {
     scene.add
       .sprite(x + 150, y + 70, Constant.ATTACK.BOMB)
       .play({ key: `${Constant.ATTACK.BOMB}-anim`, repeat: -1 })
       .setScale(0.8);
     scene.add.image(x + 150, y + 140, Constant.SPACE).setScale(0.7);
   }
-  static createItemUsage(scene: Scene, x: number, y: number) {
+  static createItemUsage(scene: Scene, x: number, y: number): void {
     Object.entries(Constant.ITEM).forEach(([key, value]) => {
       scene.rexUI.add.container(0, 0, 250, 60, [
         scene.add.image(x, y, value).setScale(0.7).setOrigin(0.3),
@@ -144,7 +152,7 @@ export default class TitleUtil {
     });
   }
 
-  static createGitHubBtn(scene: Scene, x: number, y: number) {
+  static createGitHubBtn(scene: Scene, x: number, y: number): Buttons {
     return scene.rexUI.add
       .buttons({
         x: x,
@@ -162,8 +170,8 @@ export default class TitleUtil {
         );
       });
   }
-  static createGitHubLabel(scene: Scene) {
-    const label = scene.rexUI.add.label({
+  static createGitHubLabel(scene: Scene): Label {
+    const label: Label = scene.rexUI.add.label({
       width: 48,
       height: 48,
       background: scene.add.image(0, 0, Constant.GITHUB),

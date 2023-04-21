@@ -17,6 +17,7 @@ import { FixedObstacle } from '../map/obstacle/FixedObstacle';
 import { BreakableObstacle } from '../map/obstacle/BreakableObstacle';
 import { NpcUtil } from 'src/game/utils/NpcUtil';
 import { RankingManager } from '../../managers/rankingManager';
+import { BombManager } from '../../managers/BombManager';
 
 export abstract class Character extends GameObject {
   protected item: {
@@ -170,7 +171,7 @@ export abstract class Character extends GameObject {
 
   /* others - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-  protected move(deltaTime: number) {
+  protected move(deltaTime: number): void {
     //現在位置のインデックスを取得
     const { i, j }: Index = this.getIndex();
 
@@ -194,14 +195,18 @@ export abstract class Character extends GameObject {
     const { i: nextI, j: nextJ }: Index = this.getIndex();
     if (nextI !== i || nextJ !== j) {
       //キャラクターの影響マップを更新
+      const cell: Cell = this.stage.getMap()[nextI][nextJ];
+      this.setImpactMapWithMyself(
+        NpcUtil.createImpactMap(cell, this.stage.getMap()),
+      );
     }
   }
 
   public putBomb(): void {
     if (this.bombMap.size >= this.ability.bombLimit) return;
 
-    const bombManager = this.stage.getBombManager();
-    const id = bombManager.getCurrId();
+    const bombManager: BombManager = this.stage.getBombManager();
+    const id: number = bombManager.getCurrId();
     bombManager.incrementCurrId();
 
     const { i, j }: Index = this.getIndex();
@@ -370,22 +375,22 @@ export abstract class Character extends GameObject {
   }
 
   //アニメーションを設定するメソッド
-  protected animWalkUp() {
+  protected animWalkUp(): void {
     this.animation = `${this.spriteKey}-up`;
   }
-  protected animWalkLeft() {
+  protected animWalkLeft(): void {
     this.animation = `${this.spriteKey}-left`;
   }
-  protected animWalkDown() {
+  protected animWalkDown(): void {
     this.animation = `${this.spriteKey}-down`;
   }
-  protected animTurnUp() {
+  protected animTurnUp(): void {
     this.animation = `${this.spriteKey}-turn-up`;
   }
-  protected animTurnLeft() {
+  protected animTurnLeft(): void {
     this.animation = `${this.spriteKey}-turn-left`;
   }
-  protected animTurnDown() {
+  protected animTurnDown(): void {
     this.animation = `${this.spriteKey}-turn-down`;
   }
 }

@@ -6,10 +6,10 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { iif } from 'rxjs';
 import { Server, Socket } from 'socket.io';
 import { CharacterDTO } from 'src/game/dtos/CharacterDTO';
 import { RoomDTO } from 'src/game/dtos/RoomDTO';
+import { UserDTO } from 'src/game/dtos/UserDTO';
 import { Game } from 'src/game/models/Game';
 import { Room } from 'src/game/models/Room';
 import { RoomService } from 'src/room/room.service';
@@ -39,12 +39,12 @@ export class EventsGateway {
   }
 
   //クライアント接続時
-  handleConnection(@ConnectedSocket() socket: Socket, ...args: any[]) {
+  handleConnection(@ConnectedSocket() socket: Socket, ...args: any[]): void {
     this.logger.log(`Client connected: ${socket.id}`);
   }
 
   //クライアント切断時
-  async handleDisconnect(@ConnectedSocket() socket: Socket) {
+  async handleDisconnect(@ConnectedSocket() socket: Socket): Promise<void> {
     this.logger.log(`Client disconnected: ${socket.id}`);
     //disconnectイベント発生時に、socket.leave()が自動的に行われる
 
@@ -54,7 +54,7 @@ export class EventsGateway {
 
   //ロビー入室
   @SubscribeMessage('JoinLobby')
-  joinLobby(@ConnectedSocket() socket: Socket) {
+  joinLobby(@ConnectedSocket() socket: Socket): void {
     socket.join('lobby');
   }
 
@@ -63,8 +63,10 @@ export class EventsGateway {
   async createRoom(
     @ConnectedSocket() socket: Socket,
     @MessageBody() data: { userName: string },
-  ) {
-    const room = await this.roomService.createRoom(socket, data.userName);
+  ): Promise<{
+    roomId: string;
+  }> {
+    const room: Room = await this.roomService.createRoom(socket, data.userName);
 
     return { roomId: room.getId() };
   }
@@ -105,7 +107,9 @@ export class EventsGateway {
 
   //ルーム内の全ユーザーを取得
   @SubscribeMessage('GetRoomUsers')
-  getRoomUsers(@MessageBody() data: { roomId: string }) {
+  getRoomUsers(@MessageBody() data: { roomId: string }): {
+    users: UserDTO[];
+  } {
     return { users: this.roomService.getRoomUserDTOs(data.roomId) };
   }
 
@@ -114,15 +118,15 @@ export class EventsGateway {
   notifyRoomJoin(
     @ConnectedSocket() socket: Socket,
     @MessageBody() data: { roomId: string },
-  ) {
-    const user = this.roomService.getUserDTO(socket.id, data.roomId);
+  ): void {
+    const user: UserDTO = this.roomService.getUserDTO(socket.id, data.roomId);
     this.server.in(socket.roomId).emit('UpsertUser', { user: user });
   }
 
   //ゲーム開始の準備
   @SubscribeMessage('ReadyToStartGame')
   readyToStartGame(@ConnectedSocket() socket: Socket): void {
-    const user = this.roomService.readyToStartGame(socket);
+    const user: UserDTO = this.roomService.readyToStartGame(socket);
     this.server.in(socket.roomId).emit('UpsertUser', { user: user });
   }
 
@@ -136,7 +140,7 @@ export class EventsGateway {
 
   //ゲームを開始
   @SubscribeMessage('StartGame')
-  async startGame(@ConnectedSocket() socket: Socket) {
+  async startGame(@ConnectedSocket() socket: Socket): Promise<void> {
     try {
       //ロビーから退室させる
       this.roomService.kickUsersFromLobby(socket.roomId);
@@ -161,10 +165,10 @@ export class EventsGateway {
 
   //クライアントの受信体制が整ったことを受け取る
   @SubscribeMessage('ReadyToReceiveGame')
-  readyToReceiveGame(@ConnectedSocket() socket: Socket) {
+  readyToReceiveGame(@ConnectedSocket() socket: Socket): void {
     this.roomService.readyToReceiveGame(socket);
 
-    let interval = setInterval(() => {
+    let interval: NodeJS.Timer = setInterval(() => {
       if (this.roomService.checkAllPlayersPlaying(socket)) {
         const game = this.roomService.getRoomMap().get(socket.roomId).getGame();
         this.server.emit('GetInitialState', game.getStage().getInitialState());
@@ -188,7 +192,7 @@ export class EventsGateway {
         left: boolean;
       };
     },
-  ) {
+  ):void {
     this.roomService.movePlayer(socket, data.movement);
   }
 

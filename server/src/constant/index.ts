@@ -125,17 +125,16 @@ export default class Constant {
   };
   static readonly IMPACT_MAP_WEIGHT_COEFFICIENT = {
     GET_ITEM: {
-      ITEM: 0.5,
-      EXPLOSION: 0.5,
+      ITEM: 0.6,
+      EXPLOSION: 1.0,
     },
-    DESTROY_OBSTACLE: {
-      OBSTACLE: 0.5,
-      EXPLOSION: 0.5,
+    BREAK_OBSTACLE: {
+      OBSTACLE: 0.6,
+      EXPLOSION: 1.0,
     },
     ATTACK_PLAYER: {
-      ITEM: 0.2,
-      PLAYER: 0.3,
-      EXPLOSION: 0.5,
+      PLAYER: 0.4,
+      EXPLOSION: 1.0,
     },
   };
 }

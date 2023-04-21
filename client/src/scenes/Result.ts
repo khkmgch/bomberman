@@ -15,8 +15,7 @@ export default class Result extends Scene {
   }
   public init(data: { socket: Socket }): void {
     this.setSocket(data.socket);
-
-    console.log('Result scene started');
+    // console.log('Result scene started');
   }
   public create(): void {
     if (!this.socket) return;
@@ -24,8 +23,6 @@ export default class Result extends Scene {
     const { centerX, centerY } = this.cameras.main;
     this.centerX = centerX;
     this.centerY = centerY;
-
-    const { width, height } = this.sys.canvas;
 
     //背景
     SceneUtil.createBackground(this);
@@ -44,7 +41,7 @@ export default class Result extends Scene {
   private getResult(): void {
     this.socket.emit('GetResult', (response: { result: ICharacterDTO[] }) => {
       try {
-        console.log('GetResult : ', response.result);
+        // console.log('GetResult : ', response.result);
         ResultUtil.createResultDialog(
           this,
           this.centerX,
@@ -61,7 +58,6 @@ export default class Result extends Scene {
   /* others - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
   private leaveResult(scene: Result): void {
     scene.socket.emit('LeaveResult', (response: { success: boolean }) => {
-      console.log('leaveResult method');
       try {
         if (response.success) {
           scene.reload();

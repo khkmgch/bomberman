@@ -58,16 +58,15 @@ export default class Game extends Scene {
   constructor() {
     super(Constant.SCENE.GAME);
   }
-  public init(data: { socket: Socket }) {
+  public init(data: { socket: Socket }): void {
     this.setSocket(data.socket);
 
     if (this.socket) {
       this.inputManager = new InputManager(this, this.socket);
     }
-
     // console.log('game scene started');
   }
-  public create() {
+  public create(): void {
     if (!this.socket) return;
 
     //ヘッダーの高さ分、カメラ位置を移動する（x, y座標は変わらない）
@@ -455,7 +454,7 @@ export default class Game extends Scene {
 
   /* others - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-  private shutdown() {
+  private shutdown(): void {
     // オブジェクトの削除
     this.children.removeAll(true);
   }

@@ -2,7 +2,6 @@ import { IStage } from 'src/game/interfaces/stage/IStage';
 import { Character } from './Character';
 import { Index } from 'src/game/types/Index';
 import { Item } from '../item/Item';
-import { NpcUtil } from 'src/game/utils/NpcUtil';
 import { Cell } from 'src/game/types/Cell';
 import { PriorityQueue } from 'src/game/libs/PriorityQueue/PriorityQueue';
 import { AStarNode } from 'src/game/libs/AStar/AStarNode';
@@ -41,8 +40,6 @@ export class Npc extends Character {
   };
   private foundItems: Item[] = [];
   private foundCharacters: Character[];
-  // private foundCellsForBreakObstacle: Cell[] = [];
-  // private foundCellsForAvoidExplosion: Cell[] = [];
   private action:
     | 'GET_ITEM'
     | 'ATTACK_CHARACTER'
@@ -140,10 +137,10 @@ export class Npc extends Character {
 
   /* setter - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-  public setMovableArea(area: Index[]) {
+  public setMovableArea(area: Index[]): void {
     this.movableArea = area;
   }
-  public setCurrImpactMap(impactMap: number[][]) {
+  public setCurrImpactMap(impactMap: number[][]): void {
     this.impactMaps.curr = impactMap;
   }
   public setImpactMapWithItem(impactMapWithItem: number[][]): void {
@@ -177,10 +174,10 @@ export class Npc extends Character {
   ): void {
     this.impactMaps.forAttackCharacter = impactMapForAttackCharacter;
   }
-  public setFoundItems(items: Item[]) {
+  public setFoundItems(items: Item[]): void {
     this.foundItems = items;
   }
-  public setFoundCharacters(characters: Character[]) {
+  public setFoundCharacters(characters: Character[]): void {
     this.foundCharacters = characters;
   }
 
@@ -295,7 +292,7 @@ export class Npc extends Character {
     } else {
       switch (this.action) {
         case 'GET_ITEM':
-          //ステージからアイテムに関する影響マップ(moveableAreaの範囲のみ)を取得する
+          //ステージからアイテムに関する影響マップを取得して更新する。(moveableAreaの範囲のみ)
           this.updateImpactMapWithItem();
           this.updateImpactMapForGetItem();
           this.setCurrImpactMap(this.getImpactMapForGetItem());
@@ -340,8 +337,8 @@ export class Npc extends Character {
     }
 
     let currRoute: Cell[] = this.getCurrRoute();
-    console.log('this.action', this.action);
-    console.log('currRoute', currRoute);
+    // console.log('this.action', this.action);
+    // console.log('currRoute', currRoute);
 
     if (currRoute && currRoute.length > 0) {
       const { i, j }: Index = this.getIndex();
@@ -351,6 +348,7 @@ export class Npc extends Character {
         currRoute.pop();
       }
     }
+
     if (!currRoute || currRoute.length <= 0) {
       //動かない場合
       this.stay();
@@ -403,17 +401,11 @@ export class Npc extends Character {
 
       if (this.canMove(map, deltaTime)) {
         this.move(deltaTime);
-        const { i, j }: Index = this.getIndex();
-        if (i !== prevI || j !== prevJ) {
-          const cell: Cell = map[i][j];
-          //影響マップを更新
-          this.setImpactMapWithMyself(NpcUtil.createImpactMap(cell, map));
-        }
       }
     }
   }
 
-  private updateRoute() {
+  private updateRoute(): void {
     //A*アルゴリズムで最適な経路を求める
 
     const map: Cell[][] = this.stage.getMap();
@@ -561,8 +553,8 @@ export class Npc extends Character {
     this.setCurrRoute(route);
   }
 
-  //ダイクストラ法で自分が移動できる範囲を把握する
-  public updateMovableArea() {
+  //ダイクストラ法で自分が移動できる範囲をO(n)で把握する
+  public updateMovableArea(): void {
     const map: Cell[][] = this.stage.getMap();
     const cols: number = map.length;
     const rows: number = map[0].length;
@@ -689,7 +681,7 @@ export class Npc extends Character {
   }
 
   private createImpactMapWithItem(): number[][] {
-    const map = this.stage.getMap();
+    const map: Cell[][] = this.stage.getMap();
     const cols: number = map.length;
     const rows: number = map[0].length;
     let impactMap: number[][] = Array.from({ length: cols }, () =>
@@ -790,8 +782,8 @@ export class Npc extends Character {
       Array.from({ length: rows }, () => Infinity),
     );
     this.movableArea.forEach(({ i, j }: Index) => {
-      const valueOfItem: number = impactMapWithItem[i][j] * 0.6;
-      const valueOfExplosion: number = impactMapWithExplosion[i][j];
+      const valueOfItem: number = impactMapWithItem[i][j] * Constant.IMPACT_MAP_WEIGHT_COEFFICIENT.GET_ITEM.ITEM;
+      const valueOfExplosion: number = impactMapWithExplosion[i][j] * Constant.IMPACT_MAP_WEIGHT_COEFFICIENT.GET_ITEM.EXPLOSION;
       impactMap[i][j] = Math.max(valueOfItem, valueOfExplosion);
     });
     return impactMap;
@@ -800,15 +792,15 @@ export class Npc extends Character {
   private createImpactMapForBreakObstacle(): number[][] {
     const impactMapWithObstacle: number[][] = this.getImpactMapWithObstacle();
     const impactMapWithExplosion: number[][] = this.getImpactMapWithExplosion();
-    const map = this.stage.getMap();
+    const map: Cell[][] = this.stage.getMap();
     const cols: number = map.length;
     const rows: number = map[0].length;
     let impactMap: number[][] = Array.from({ length: cols }, () =>
       Array.from({ length: rows }, () => Infinity),
     );
     this.movableArea.forEach(({ i, j }: Index) => {
-      const valueOfObstacle: number = impactMapWithObstacle[i][j] * 0.6;
-      const valueOfExplosion: number = impactMapWithExplosion[i][j];
+      const valueOfObstacle: number = impactMapWithObstacle[i][j] * Constant.IMPACT_MAP_WEIGHT_COEFFICIENT.BREAK_OBSTACLE.OBSTACLE;
+      const valueOfExplosion: number = impactMapWithExplosion[i][j] * Constant.IMPACT_MAP_WEIGHT_COEFFICIENT.BREAK_OBSTACLE.EXPLOSION;
       impactMap[i][j] = Math.max(valueOfObstacle, valueOfExplosion);
     });
     return impactMap;
@@ -816,15 +808,15 @@ export class Npc extends Character {
   private createImpactMapForAttackCharacter(): number[][] {
     const impactMapWithCharacter: number[][] = this.getImpactMapWithCharacter();
     const impactMapWithExplosion: number[][] = this.getImpactMapWithExplosion();
-    const map = this.stage.getMap();
+    const map: Cell[][] = this.stage.getMap();
     const cols: number = map.length;
     const rows: number = map[0].length;
     let impactMap: number[][] = Array.from({ length: cols }, () =>
       Array.from({ length: rows }, () => Infinity),
     );
     this.movableArea.forEach(({ i, j }: Index) => {
-      const valueOfCharacter: number = impactMapWithCharacter[i][j] * 0.4;
-      const valueOfExplosion: number = impactMapWithExplosion[i][j];
+      const valueOfCharacter: number = impactMapWithCharacter[i][j] * Constant.IMPACT_MAP_WEIGHT_COEFFICIENT.ATTACK_PLAYER.PLAYER;
+      const valueOfExplosion: number = impactMapWithExplosion[i][j] * Constant.IMPACT_MAP_WEIGHT_COEFFICIENT.ATTACK_PLAYER.EXPLOSION;
       impactMap[i][j] = Math.max(valueOfCharacter, valueOfExplosion);
     });
     return impactMap;
@@ -856,6 +848,7 @@ export class Npc extends Character {
       return;
     }
 
+    //「経路が短い = 移動コストが小さい」ものをターゲットに設定する
     if (
       forGetItem.route.length > 0 &&
       (forGetItem.route.length <= forAttackCharacter.route.length ||
@@ -863,7 +856,7 @@ export class Npc extends Character {
       (forGetItem.route.length <= forBreakObstacle.route.length ||
         forBreakObstacle.route.length <= 0)
     ) {
-      // routeForGetItem が最も長い場合の処理
+      // routeForGetItem.route が最も短い場合の処理
       this.setAction('GET_ITEM');
       this.setTargetForGetItem({ item: forGetItem.target });
     } else if (
@@ -873,7 +866,7 @@ export class Npc extends Character {
       (forAttackCharacter.route.length <= forBreakObstacle.route.length ||
         forBreakObstacle.route.length <= 0)
     ) {
-      // routeForAttackCharacter が最も長い場合の処理
+      // routeForAttackCharacter.route が最も短い場合の処理
       this.setAction('ATTACK_CHARACTER');
       this.setTargetForAttackCharacter({
         character: forAttackCharacter.target,
@@ -885,7 +878,7 @@ export class Npc extends Character {
       (forBreakObstacle.route.length <= forAttackCharacter.route.length ||
         forAttackCharacter.route.length <= 0)
     ) {
-      // routeForBreakObstacle が最も長い場合の処理
+      // routeForBreakObstacle.route が最も短い場合の処理
       this.setAction('BREAK_OBSTACLE');
       this.setTargetForBreakObstacle({ cell: forBreakObstacle.target });
     }
@@ -928,7 +921,7 @@ export class Npc extends Character {
       | 'ATTACK_CHARACTER'
       | 'BREAK_OBSTACLE'
       | 'AVOID_EXPLOSION',
-  ) {
+  ): Cell[] {
     //A*アルゴリズムで最適な経路を求める
     //経路
     let route: Cell[] = [];
@@ -1227,8 +1220,6 @@ export class Npc extends Character {
     if (!targetCells || targetCells.length <= 0)
       return { route: [], target: null };
 
-    // this.foundCellsForBreakObstacle = targetCells;
-
     let res: { route: Cell[]; target: Cell } = { route: [], target: null };
     for (let k = 0; k < targetCells.length; k++) {
       const targetCell: Cell = targetCells[k];
@@ -1323,7 +1314,7 @@ export class Npc extends Character {
   }
   private hasReachedTargetCell(): boolean {
     const { i, j }: Index = this.getIndex();
-    const map = this.stage.getMap();
+    const map: Cell[][] = this.stage.getMap();
     let targetCell: Cell = null;
     switch (this.action) {
       case 'GET_ITEM':

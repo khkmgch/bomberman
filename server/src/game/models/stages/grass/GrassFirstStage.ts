@@ -11,7 +11,7 @@ import { Cell } from 'src/game/types/Cell';
 // 草原ファーストステージクラス
 export class GrassFirstStage extends GrassStage implements IFirstStage {
   // 草原ファーストステージ独自の情報
-  // private firstStageInfo: string = 'You can see a big tree';
+  private firstStageInfo: string = 'You can see small flowers';
 
   constructor(eventsGateway: EventsGateway, roomId: string) {
     super(1, eventsGateway, roomId);

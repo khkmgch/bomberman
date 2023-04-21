@@ -166,14 +166,14 @@ export class GenericStage implements IStage {
     });
     return arr;
   }
-  private getFixedObstacleDTOs() {
+  private getFixedObstacleDTOs(): FixedObstacleDTO[] {
     let arr: FixedObstacleDTO[] = [];
     this.fixedObstacleManager.getMap().forEach((fixedObstacle) => {
       arr.push(fixedObstacle.toDTO());
     });
     return arr;
   }
-  private getBreakableObstacleDTOs() {
+  private getBreakableObstacleDTOs(): BreakableObstacleDTO[] {
     let arr: BreakableObstacleDTO[] = [];
     this.breakableObstacleManager.getMap().forEach((breakableObstacle) => {
       arr.push(breakableObstacle.toDTO());
@@ -348,7 +348,7 @@ export class GenericStage implements IStage {
     // console.log('impactMapByItem', this.impactMap.item);
   }
   public updateImpactMapWithExplosion(): void {
-    const bombMap = this.bombManager.getMap();
+    const bombMap: Map<number, Bomb> = this.bombManager.getMap();
     const markerMap: Map<number, Marker> = this.markerManager.getMap();
     const explosionMap: Map<number, Explosion> = this.explosionManager.getMap();
     const impactMap: number[][] = Array.from({ length: this.cols }, () =>

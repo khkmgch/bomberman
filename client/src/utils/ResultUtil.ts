@@ -4,6 +4,9 @@ import Result from '../scenes/Result';
 import Label from 'phaser3-rex-plugins/templates/ui/label/Label';
 import { ICharacterDTO } from '../dtos/interface/ICharacterDTO';
 import Container from 'phaser3-rex-plugins/templates/ui/container/Container';
+import TextBox from 'phaser3-rex-plugins/templates/ui/textbox/TextBox';
+import Dialog from 'phaser3-rex-plugins/templates/ui/dialog/Dialog';
+import GridSizer from 'phaser3-rex-plugins/templates/ui/gridsizer/GridSizer';
 
 export class ResultUtil {
   static createResultTextBox(
@@ -13,8 +16,8 @@ export class ResultUtil {
     wrapWidth: number,
     fixedWidth: number,
     fixedHeight: number
-  ) {
-    let textBox = scene.rexUI.add
+  ): TextBox {
+    let textBox: TextBox = scene.rexUI.add
       .textBox({
         x: x,
         y: y,
@@ -50,7 +53,7 @@ export class ResultUtil {
     wrapWidth: number,
     fixedWidth: number,
     fixedHeight: number
-  ) {
+  ): Phaser.GameObjects.Text {
     return scene.add
       .text(0, 0, '- Result -', {
         fontFamily: 'PressStart2P',
@@ -70,8 +73,8 @@ export class ResultUtil {
     text: string,
     fontSize: string,
     colorNum: number
-  ) {
-    const label = scene.rexUI.add.label({
+  ): Label {
+    const label: Label = scene.rexUI.add.label({
       orientation: 'x',
       background: scene.rexUI.add
         .roundRectangle(0, 0, 10, 10, 10, colorNum)
@@ -98,8 +101,8 @@ export class ResultUtil {
     y: number,
     characterArr: ICharacterDTO[],
     onLeave: (scene: Result) => void
-  ) {
-    const dialog = scene.rexUI.add
+  ): Dialog {
+    const dialog: Dialog = scene.rexUI.add
       .dialog({
         x: x,
         y: y,
@@ -144,8 +147,6 @@ export class ResultUtil {
           ),
         ],
 
-        // actionsAlign: 'left',
-
         space: {
           title: 150,
           content: 50,
@@ -159,7 +160,6 @@ export class ResultUtil {
       })
       .layout()
       .pushIntoBounds()
-      //.drawBounds(this.add.graphics(), 0xff0000)
       .popUp(500)
       .setDepth(1);
 
@@ -180,8 +180,8 @@ export class ResultUtil {
   static createRoomDialogContent(
     scene: Phaser.Scene,
     characterArr: ICharacterDTO[]
-  ) {
-    const gridSizer = scene.rexUI.add
+  ): GridSizer {
+    const gridSizer: GridSizer = scene.rexUI.add
       .gridSizer({
         x: 0,
         y: 0,
