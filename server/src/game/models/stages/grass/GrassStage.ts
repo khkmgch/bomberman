@@ -4,7 +4,6 @@ import { MathUtil } from 'src/game/utils/MathUtil';
 import { BreakableObstacle } from '../../objects/map/obstacle/BreakableObstacle';
 import { EdgeObstacle } from '../../objects/map/obstacle/EdgeObstacle';
 import { FixedObstacle } from '../../objects/map/obstacle/FixedObstacle';
-import { GameObject } from '../../objects/GameObject';
 import { Ground } from '../../objects/map/Ground';
 import { GenericStage } from '../generic/GenericStage';
 import { Cell } from 'src/game/types/Cell';
@@ -44,15 +43,15 @@ export class GrassStage extends GenericStage {
     super('Grass', level, eventsGateway, roomId);
   }
 
-  getInfo(): string {
+  public getInfo(): string {
     return this.info;
   }
 
-  toString(): string {
+  public toString(): string {
     return `${super.getType()}\n${this.getInfo()}`;
   }
 
-  protected addGround(map: Cell[][], i: number, j: number) {
+  protected addGround(map: Cell[][], i: number, j: number): void {
     const x: number = i * this.tileSize;
     const y: number = j * this.tileSize;
     const id: number = this.groundManager.getCurrId();
@@ -92,12 +91,12 @@ export class GrassStage extends GenericStage {
     };
   }
 
-  protected addEdgeObstacle(map: Cell[][], i: number, j: number) {
+  protected addEdgeObstacle(map: Cell[][], i: number, j: number): void {
     const x: number = i * this.tileSize;
     const y: number = j * this.tileSize;
     const id: number = this.edgeObstacleManager.getCurrId();
     const spriteKeyArr: string[] = GrassStage.SPRITE_KEY_MAP.EDGE_OBSTACLE;
-    const spriteKey =
+    const spriteKey: string =
       spriteKeyArr[MathUtil.getRandomInt(0, spriteKeyArr.length - 1)];
 
     //EdgeObstacleを生成
@@ -114,12 +113,12 @@ export class GrassStage extends GenericStage {
       item: null,
     };
   }
-  protected addFixedObstacle(map: Cell[][], i: number, j: number) {
-    const x = i * this.tileSize;
-    const y = j * this.tileSize;
-    const id = this.fixedObstacleManager.getCurrId();
+  protected addFixedObstacle(map: Cell[][], i: number, j: number): void {
+    const x: number = i * this.tileSize;
+    const y: number = j * this.tileSize;
+    const id: number = this.fixedObstacleManager.getCurrId();
     const spriteKeyArr: string[] = GrassStage.SPRITE_KEY_MAP.FIXED_OBSTACLE;
-    const spriteKey =
+    const spriteKey: string =
       spriteKeyArr[MathUtil.getRandomInt(0, spriteKeyArr.length - 1)];
 
     //FixedObstacleを生成
@@ -138,14 +137,19 @@ export class GrassStage extends GenericStage {
       item: null,
     };
   }
-  protected addBreakableObstacle(map: Cell[][], i: number, j: number) {
+  protected addBreakableObstacle(map: Cell[][], i: number, j: number): void {
     const x = i * this.tileSize;
     const y = j * this.tileSize;
     const id = this.breakableObstacleManager.getCurrId();
     const spriteKey: string = GrassStage.SPRITE_KEY_MAP.BREAKABLE_OBSTACLE;
 
     //BreakableObstacleを生成
-    const breakableObstacle = new BreakableObstacle(id, x, y, spriteKey);
+    const breakableObstacle: BreakableObstacle = new BreakableObstacle(
+      id,
+      x,
+      y,
+      spriteKey,
+    );
     //BreakableObstacleManagerに追加
     this.breakableObstacleManager
       .getMap()

@@ -50,7 +50,7 @@ export class Bomb extends GameObject {
   public toDTO(): BombDTO {
     return super.toDTO();
   }
-  private getMarkerDTOs() {
+  private getMarkerDTOs(): MarkerDTO[] {
     const markerDTOs: MarkerDTO[] = [];
 
     for (const marker of this.markers) {
@@ -65,7 +65,7 @@ export class Bomb extends GameObject {
     }
     return ids;
   }
-  private addMarkers() {
+  private addMarkers(): void {
     const map: Cell[][] = this.stage.getMap();
     const { i: centerI, j: centerJ }: Index = this.getIndex();
     //上
@@ -83,7 +83,7 @@ export class Bomb extends GameObject {
     di: number,
     dj: number,
     map: Cell[][],
-  ) {
+  ): void {
     for (
       let k: number = 0;
       k < this.character.getExplosionRange() &&
@@ -101,9 +101,9 @@ export class Bomb extends GameObject {
       } else this.addMarker(i, j);
     }
   }
-  private addMarker(i: number, j: number) {
+  private addMarker(i: number, j: number): void {
     const markerManager: MarkerManager = this.stage.getMarkerManager();
-    const id = markerManager.getCurrId();
+    const id: number = markerManager.getCurrId();
     markerManager.incrementCurrId();
     const { x, y }: Position = {
       x: i * this.stage.getTileSize(),
@@ -118,10 +118,9 @@ export class Bomb extends GameObject {
     //markerManagerに追加
     markerManager.getMap().set(id, marker);
     //配列にpush
-    // this.marker.top.push(marker);
     this.markers.push(marker);
   }
-  private explode() {
+  private explode(): void {
     const bombMap: Map<number, Bomb> = this.character.getBombMap();
     const bombManager: BombManager = this.stage.getBombManager();
     const markerManager: MarkerManager = this.stage.getMarkerManager();

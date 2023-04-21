@@ -5,10 +5,14 @@ import Label from 'phaser3-rex-plugins/templates/ui/label/Label';
 import Constant from '../../../server/src/constant';
 import { IRoomDTO } from '../dtos/interface/IRoomDTO';
 import Lobby from '../scenes/Lobby';
+import Buttons from 'phaser3-rex-plugins/templates/ui/buttons/Buttons';
+import Dialog from 'phaser3-rex-plugins/templates/ui/dialog/Dialog';
+import GridSizer from 'phaser3-rex-plugins/templates/ui/gridsizer/GridSizer';
+import Flip from 'phaser3-rex-plugins/plugins/flip';
 
 export default class LobbyUtil {
-  static createNameInputLabel(scene: Scene, x: number, y: number) {
-    let label = scene.rexUI.add.label({
+  static createNameInputLabel(scene: Scene, x: number, y: number): Label {
+    let label: Label = scene.rexUI.add.label({
       width: 200,
       height: 40,
       text: scene.add.text(x, y, 'Name', {
@@ -28,7 +32,7 @@ export default class LobbyUtil {
     width: number,
     height: number,
     userName: string
-  ) {
+  ): Label {
     const label: Label = scene.rexUI.add.label({
       background: scene.rexUI.add
         .roundRectangle(x, y, width, height, 10)
@@ -57,7 +61,7 @@ export default class LobbyUtil {
     return label;
   }
 
-  static createNewRoomBtn(scene: Scene, x: number, y: number) {
+  static createNewRoomBtn(scene: Scene, x: number, y: number): Buttons {
     return LobbyUtil.createBtn(
       scene,
       x,
@@ -72,7 +76,7 @@ export default class LobbyUtil {
       scene.events.emit('create_room');
     });
   }
-  static createStartGameBtn(scene: Scene, x: number, y: number) {
+  static createStartGameBtn(scene: Scene, x: number, y: number): Buttons {
     return LobbyUtil.createBtn(
       scene,
       x,
@@ -95,7 +99,7 @@ export default class LobbyUtil {
     x: number,
     y: number,
     label: Phaser.GameObjects.GameObject
-  ) {
+  ): Buttons {
     return scene.rexUI.add
       .buttons({
         x,
@@ -111,8 +115,8 @@ export default class LobbyUtil {
     text: string,
     fontSize: string,
     colorNum: number
-  ) {
-    const label = scene.rexUI.add.label({
+  ): Label {
+    const label: Label = scene.rexUI.add.label({
       orientation: 'x',
       background: scene.rexUI.add
         .roundRectangle(0, 0, 10, 10, 10, colorNum)
@@ -299,8 +303,8 @@ export default class LobbyUtil {
     y: number,
     onLeave: (scene: Lobby) => void,
     onReady: (scene: Lobby) => void
-  ) {
-    const dialog = scene.rexUI.add
+  ): Dialog {
+    const dialog: Dialog = scene.rexUI.add
       .dialog({
         x: x,
         y: y,
@@ -351,8 +355,6 @@ export default class LobbyUtil {
           ),
         ],
 
-        // actionsAlign: 'left',
-
         space: {
           title: 150,
           content: 50,
@@ -366,7 +368,6 @@ export default class LobbyUtil {
       })
       .layout()
       .pushIntoBounds()
-      //.drawBounds(this.add.graphics(), 0xff0000)
       .popUp(500)
       .setDepth(1);
 
@@ -387,8 +388,8 @@ export default class LobbyUtil {
     return dialog;
   }
 
-  static createRoomDialogContent(scene: Phaser.Scene) {
-    const gridSizer = scene.rexUI.add
+  static createRoomDialogContent(scene: Phaser.Scene): GridSizer {
+    const gridSizer: GridSizer = scene.rexUI.add
       .gridSizer({
         x: 0,
         y: 0,
@@ -414,8 +415,8 @@ export default class LobbyUtil {
     return gridSizer;
   }
 
-  static createPlayerPanel(scene: Phaser.Scene, spriteKey: string) {
-    const label = scene.rexUI.add
+  static createPlayerPanel(scene: Phaser.Scene, spriteKey: string): Label {
+    const label: Label = scene.rexUI.add
       .label({
         orientation: 1,
         background: scene.rexUI.add
@@ -464,8 +465,14 @@ export default class LobbyUtil {
       })
       .layout();
 
-    const children = label.getChildren();
-    const background = label.getElement('background');
+    const children: Phaser.GameObjects.GameObject[] = label.getChildren();
+    const background:
+      | Phaser.GameObjects.GameObject
+      | Phaser.GameObjects.GameObject[]
+      | {
+          [name: string]: Phaser.GameObjects.GameObject;
+        }
+      | null = label.getElement('background');
     children.forEach((child: any) => {
       if (child === background) {
         child.setFillStyle(Constant.COLOR_NUMBER.CHARCOAL_GRAY);
@@ -481,8 +488,8 @@ export default class LobbyUtil {
     scene: Phaser.Scene,
     playerPanel: Label,
     currFace: 'back' | 'front'
-  ) {
-    const flip = scene.rexUI.add.flip(playerPanel, {
+  ): void {
+    const flip: Flip = scene.rexUI.add.flip(playerPanel, {
       duration: 200,
       face: currFace,
       front: (gameObject: any) => {

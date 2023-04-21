@@ -1,5 +1,5 @@
 import { Scene } from 'phaser';
-import { io, Socket } from 'socket.io-client';
+import { Socket } from 'socket.io-client';
 import Constant from '../../../server/src/constant';
 import SceneUtil from '../utils/SceneUtil';
 import TitleUtil from '../utils/TitleUtil';
@@ -10,12 +10,12 @@ export default class Title extends Scene {
     super(Constant.SCENE.TITLE);
   }
 
-  public init(data: { socket: Socket }) {
+  public init(data: { socket: Socket }): void {
     this.socket = data.socket;
     // console.log(`id : ${this.socket.id}`);
   }
 
-  public create() {
+  public create(): void {
     const { centerX, centerY } = this.cameras.main;
 
     //背景
@@ -46,7 +46,7 @@ export default class Title extends Scene {
     this.events.on('start_lobby', this.startLobby, this);
   }
 
-  private startLobby() {
+  private startLobby(): void {
     this.scene.start(Constant.SCENE.LOBBY, {
       socket: this.socket,
     });
@@ -54,12 +54,9 @@ export default class Title extends Scene {
     this.shutdown();
     this.scene.stop(Constant.SCENE.TITLE);
   }
-  private shutdown() {
+  private shutdown(): void {
     // イベントリスナーの解除
     this.events.off('start_lobby', this.startLobby, this);
-
-    // アニメーションの停止
-    // this.anims.pauseAll();
 
     // オブジェクトの削除
     this.children.removeAll(true);

@@ -3,9 +3,7 @@ import { IStage } from 'src/game/interfaces/stage/IStage';
 import { Index } from 'src/game/types/Index';
 import { Movement } from 'src/game/types/Movement';
 import { Character } from './Character';
-import { Cell } from 'src/game/types/Cell';
 import { Item } from '../item/Item';
-import { NpcUtil } from 'src/game/utils/NpcUtil';
 
 export class Player extends Character {
   private movement: Movement = {
@@ -68,18 +66,8 @@ export class Player extends Character {
       this.animWalkLeft();
     }
 
-    const { i: prevI, j: prevJ }: Index = this.getIndex();
-
     if (this.canMove(this.stage.getMap(), deltaTime)) {
       this.move(deltaTime);
-      const { i, j }: Index = this.getIndex();
-      const cell: Cell = this.stage.getMap()[i][j];
-      if (i !== prevI || j !== prevJ) {
-        //影響マップを更新
-        this.setImpactMapWithMyself(
-          NpcUtil.createImpactMap(cell, this.stage.getMap()),
-        );
-      }
     }
     if (this.overlapWithExplosion(this.stage.getMap())) {
       this.takeDamage();

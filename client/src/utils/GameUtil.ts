@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import Constant from '../../../server/src/constant';
 import Game from '../scenes/Game';
+import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer';
 
 export class GameUtil {
   static setCountDown(
@@ -9,7 +10,7 @@ export class GameUtil {
     x: number,
     y: number
   ): Phaser.GameObjects.Text {
-    const text = scene.add
+    const text: Phaser.GameObjects.Text = scene.add
       .text(x, y, count === 0 ? 'Start' : count.toString(), {
         fontSize: '128px',
         color: Constant.COLOR_STRING.POWDER_PINK,
@@ -24,7 +25,7 @@ export class GameUtil {
     }, 500);
     return text;
   }
-  static createHeaderBackGround(scene: Scene, x: number, y: number) {
+  static createHeaderBackGround(scene: Scene, x: number, y: number): Sizer {
     return scene.rexUI.add
       .sizer({
         x: x,
@@ -40,7 +41,12 @@ export class GameUtil {
       )
       .layout();
   }
-  static createImg(scene: Scene, x: number, y: number, texture: string) {
+  static createImg(
+    scene: Scene,
+    x: number,
+    y: number,
+    texture: string
+  ): Phaser.GameObjects.Image {
     return scene.add.image(x, y, texture).setScale(0.8).setOrigin(0, 0.5);
   }
   static createText(
@@ -49,8 +55,8 @@ export class GameUtil {
     y: number,
     text: string
   ): Phaser.GameObjects.Text {
-    const fontSize = 24;
-    const paddingHeight = (Constant.HEADER.HEIGHT - fontSize) / 2;
+    const fontSize: number = 24;
+    const paddingHeight: number = (Constant.HEADER.HEIGHT - fontSize) / 2;
     return scene.add
       .text(x, y, text, {
         fontSize: `${fontSize}px`,
@@ -59,7 +65,7 @@ export class GameUtil {
       })
       .setPadding(10, paddingHeight, 10, paddingHeight);
   }
-  static createHeader(scene: Game) {
+  static createHeader(scene: Game): void {
     GameUtil.createHeaderBackGround(
       scene,
       scene.getCenterX(),

@@ -124,18 +124,18 @@ export class Guards {
     return Guards.isGameObjectDTO(obj);
   }
   static isCharacterDTO(obj: any): obj is ICharacterDTO {
-    console.log(obj);
-    console.log(
-      Guards.isGameObjectDTO(obj) &&
-        'name' in obj &&
-        typeof obj.name === 'string' &&
-        'direction' in obj &&
-        typeof obj.direction === 'number' &&
-        'stock' in obj &&
-        typeof obj.stock === 'number' &&
-        'initStock' in obj &&
-        typeof obj.initStock === 'number'
-    );
+    // console.log(obj);
+    // console.log(
+    //   Guards.isGameObjectDTO(obj) &&
+    //     'name' in obj &&
+    //     typeof obj.name === 'string' &&
+    //     'direction' in obj &&
+    //     typeof obj.direction === 'number' &&
+    //     'stock' in obj &&
+    //     typeof obj.stock === 'number' &&
+    //     'initStock' in obj &&
+    //     typeof obj.initStock === 'number'
+    // );
     return (
       Guards.isGameObjectDTO(obj) &&
       'name' in obj &&

@@ -3,8 +3,6 @@ import { EventsGateway } from 'src/events/events.gateway';
 import { GrassStageFactory } from '../factories/stage/GrassStageFactory';
 import { IStageFactory } from '../interfaces/factory/IStageFactory';
 import { IStage } from '../interfaces/stage/IStage';
-import { Player } from './objects/character/Player';
-import { Npc } from './objects/character/Npc';
 
 export class Game {
   private stageFactory: IStageFactory;
@@ -22,7 +20,7 @@ export class Game {
 
   /* getter - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-  public getStage() {
+  public getStage(): IStage {
     return this.stage;
   }
   public getIsAcceptingInput(): boolean {
@@ -40,7 +38,7 @@ export class Game {
 
   /* others - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-  public startCountDown() {
+  public startCountDown(): void {
     const countDown: number[] = [3, 2, 1];
 
     // クライアントにカウントダウンを送信する

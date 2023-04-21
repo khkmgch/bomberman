@@ -1,11 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { Server, Socket } from 'socket.io';
+import { Injectable } from '@nestjs/common';
+import { Socket } from 'socket.io';
 import Constant from 'src/constant';
-import { EventsGateway } from 'src/events/events.gateway';
 import { RoomDTO } from 'src/game/dtos/RoomDTO';
 import { UserDTO } from 'src/game/dtos/UserDTO';
 import { Game } from 'src/game/models/Game';
-
 import { Room } from '../game/models/Room';
 import { User } from '../game/models/User';
 import { Character } from 'src/game/models/objects/character/Character';
@@ -40,7 +38,7 @@ export class RoomService {
   getRoomUserDTOs(roomId: string): UserDTO[] {
     if (!this.roomExists(roomId)) return null;
 
-    const room = this.roomMap.get(roomId);
+    const room: Room = this.roomMap.get(roomId);
 
     if (room.getIsRemoving()) return null;
 
@@ -85,7 +83,7 @@ export class RoomService {
         //ルームがない場合
         if (!this.roomExists(roomId)) return { room: null, success: false };
 
-        const room = this.roomMap.get(roomId);
+        const room: Room = this.roomMap.get(roomId);
         //ルームが削除中、または鍵がかかっている場合
         if (room.getIsRemoving() || room.getIsLocked())
           return { room, success: false };
@@ -158,7 +156,7 @@ export class RoomService {
     //ルームがない場合
     if (!this.roomExists(roomId)) return;
 
-    const room = this.roomMap.get(roomId);
+    const room: Room = this.roomMap.get(roomId);
     //ルームが削除中の場合
     if (room.getIsRemoving()) return;
 
@@ -183,7 +181,7 @@ export class RoomService {
   addUser(socket: Socket, userName: string, room: Room): void {
     //ルーム内でのidを割り当てる
     let id: number = 0;
-    let map = new Map<number, User>();
+    let map: Map<number, User> = new Map<number, User>();
     for (const user of room.getUserMap().values()) {
       map.set(user.getId(), user);
     }
@@ -203,7 +201,7 @@ export class RoomService {
 
   //ルームからユーザーを削除
   removeUser(socket: Socket, roomId: string): void {
-    const user = this.roomMap.get(roomId).getUserMap().get(socket.id);
+    const user: User = this.roomMap.get(roomId).getUserMap().get(socket.id);
     socket.emit('RemoveUser', { user: user.toDTO() });
     socket.in(roomId).emit('RemoveUser', { user: user.toDTO() });
 
@@ -337,7 +335,11 @@ export class RoomService {
   //使用されていないルームを削除する
   removeInactiveRooms(): void {
     this.roomMap.forEach((room: Room, roomId: string) => {
-      if (room.getUserMap().size <= 0) this.removeRoom(roomId);
+      if (room.getUserMap().size <= 0) {
+        console.log('room :', room);
+        console.log('This room has no user. Then remove room.');
+        this.removeRoom(roomId);
+      }
     });
   }
 
@@ -350,7 +352,7 @@ export class RoomService {
       down: boolean;
       left: boolean;
     },
-  ) {
+  ): void {
     try {
       if (this.userExists(socket.roomId, socket.id)) {
         const room: Room = this.getRoomMap().get(socket.roomId);
@@ -383,7 +385,7 @@ export class RoomService {
   }
 
   //爆弾を設置する
-  putBomb(socket: Socket) {
+  putBomb(socket: Socket): void {
     try {
       if (this.userExists(socket.roomId, socket.id)) {
         const room: Room = this.getRoomMap().get(socket.roomId);
@@ -420,25 +422,20 @@ export class RoomService {
   } {
     try {
       if (this.userExists(socket.roomId, socket.id)) {
-        console.log('User exists');
         const room: Room = this.getRoomMap().get(socket.roomId);
         const game: Game = room.getGame();
         if (game) {
-          console.log('Game exists');
           const stage: IStage = game.getStage();
           if (stage) {
-            console.log('Stage exists');
             const rankingMap: Map<number, Character> = stage
               .getRankingManager()
               .getMap();
-            console.log('rankingMap.size : ', rankingMap.size);
             if (rankingMap.size >= Constant.MAX_PLAYERS_PER_ROOM) {
               let arr: CharacterDTO[] = [];
               for (let i = 1; i <= Constant.MAX_PLAYERS_PER_ROOM; i++) {
                 if (!rankingMap.has(i)) continue;
                 arr.push(rankingMap.get(i).toDTO());
               }
-              console.log('arr : ', arr);
               return { result: arr };
             } else {
               throw new Error('Ranking not ready');

@@ -10,7 +10,7 @@ export default class Preloader extends Scene {
     super(Constant.SCENE.PRELOADER);
   }
 
-  public init() {
+  public init(): void {
     const socket = io(`${import.meta.env.VITE_API_URL}`);
     this.socket = socket;
 
@@ -19,7 +19,7 @@ export default class Preloader extends Scene {
     });
   }
 
-  public preload() {
+  public preload(): void {
     const { centerX, centerY } = this.cameras.main;
 
     this.add.text(centerX - 100, centerY, 'Loading...', {
@@ -109,7 +109,7 @@ export default class Preloader extends Scene {
     this.load.once('complete', this.onLoadComplete, this);
   }
 
-  private onLoadComplete() {
+  private onLoadComplete(): void {
     AnimationUtil.createBackgroundAnim(this.anims);
     AnimationUtil.createCatAnim(this.anims);
     AnimationUtil.createBombAnim(this.anims);

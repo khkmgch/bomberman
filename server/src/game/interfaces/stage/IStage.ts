@@ -4,7 +4,6 @@ import { BreakableObstacleManager } from 'src/game/models/managers/BreakableObst
 import { EdgeObstacleManager } from 'src/game/models/managers/EdgeObstacleManager';
 import { FixedObstacleManager } from 'src/game/models/managers/FixedObstacleManager';
 import { GroundManager } from 'src/game/models/managers/GroundManager';
-import { GameObject } from 'src/game/models/objects/GameObject';
 import { Npc } from 'src/game/models/objects/character/Npc';
 import { Player } from 'src/game/models/objects/character/Player';
 import { Movement } from 'src/game/types/Movement';
@@ -17,7 +16,6 @@ import { MarkerManager } from 'src/game/models/managers/MarkerManager';
 import { ExplosionManager } from 'src/game/models/managers/ExplosionManager';
 import { ItemManager } from 'src/game/models/managers/ItemManager';
 import { Cell } from 'src/game/types/Cell';
-import { Character } from 'src/game/models/objects/character/Character';
 import { RankingManager } from 'src/game/models/managers/rankingManager';
 
 // ステージインターフェース

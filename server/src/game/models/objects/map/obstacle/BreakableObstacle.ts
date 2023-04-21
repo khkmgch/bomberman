@@ -2,7 +2,6 @@ import { BreakableObstacleDTO } from 'src/game/dtos/BreakableObstacleDTO';
 import { IStage } from 'src/game/interfaces/stage/IStage';
 import { ItemManager } from 'src/game/models/managers/ItemManager';
 import { GrassStage } from 'src/game/models/stages/grass/GrassStage';
-import { MathUtil } from 'src/game/utils/MathUtil';
 import { GameObject } from '../../GameObject';
 import { BombUp } from '../../item/BombUp';
 import { FireUp } from '../../item/FireUp';

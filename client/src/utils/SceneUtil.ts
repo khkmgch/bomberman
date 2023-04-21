@@ -2,7 +2,7 @@ import { Scene } from 'phaser';
 import Constant from '../../../server/src/constant';
 
 export default class SceneUtil {
-  static createBackground(scene: Scene) {
+  static createBackground(scene: Scene):void {
     scene.add
       .sprite(0, 0, Constant.BACKGROUND)
       .setOrigin(0, 0)

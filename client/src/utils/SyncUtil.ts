@@ -21,12 +21,12 @@ import Game from '../scenes/Game';
 import AnimationUtil from './AnimationUtil';
 
 export class SyncUtil {
-  static addGrounds(groundArr: IGroundDTO[], scene: Game) {
+  static addGrounds(groundArr: IGroundDTO[], scene: Game): void {
     if (groundArr && groundArr.length > 0) {
       const groundMap: Map<number, IGround> = scene.getObjects().groundMap;
       groundArr.forEach((ground) => {
         if (!groundMap.has(ground.id)) {
-          const sprite = scene.add
+          const sprite: Phaser.GameObjects.Sprite = scene.add
             .sprite(ground.x, ground.y, ground.spriteKey)
             .setScale(1.0)
             .setOrigin(0);
@@ -45,13 +45,16 @@ export class SyncUtil {
       });
     }
   }
-  static addEdgeObstacles(edgeObstacleArr: IEdgeObstacleDTO[], scene: Game) {
+  static addEdgeObstacles(
+    edgeObstacleArr: IEdgeObstacleDTO[],
+    scene: Game
+  ): void {
     if (edgeObstacleArr && edgeObstacleArr.length > 0) {
       const edgeObstacleMap: Map<number, IEdgeObstacle> =
         scene.getObjects().edgeObstacleMap;
       edgeObstacleArr.forEach((edgeObstacle) => {
         if (!edgeObstacleMap.has(edgeObstacle.id)) {
-          const sprite = scene.add
+          const sprite: Phaser.GameObjects.Sprite = scene.add
             .sprite(edgeObstacle.x, edgeObstacle.y, edgeObstacle.spriteKey)
             .setScale(1.0)
             .setOrigin(0);
@@ -72,13 +75,16 @@ export class SyncUtil {
       });
     }
   }
-  static addFixedObstacles(fixedObstacleArr: IFixedObstacleDTO[], scene: Game) {
+  static addFixedObstacles(
+    fixedObstacleArr: IFixedObstacleDTO[],
+    scene: Game
+  ): void {
     if (fixedObstacleArr && fixedObstacleArr.length > 0) {
       const fixedObstacleMap: Map<number, IFixedObstacle> =
         scene.getObjects().fixedObstacleMap;
       fixedObstacleArr.forEach((fixedObstacle) => {
         if (!fixedObstacleMap.has(fixedObstacle.id)) {
-          const sprite = scene.add
+          const sprite: Phaser.GameObjects.Sprite = scene.add
             .sprite(fixedObstacle.x, fixedObstacle.y, fixedObstacle.spriteKey)
             .setScale(1.0)
             .setOrigin(0);
@@ -99,13 +105,13 @@ export class SyncUtil {
   static addBreakableObstacles(
     breakableObstacleArr: IBreakableObstacleDTO[],
     scene: Game
-  ) {
+  ): void {
     if (breakableObstacleArr && breakableObstacleArr.length > 0) {
       const breakableObstacleMap: Map<number, IBreakableObstacle> =
         scene.getObjects().breakableObstacleMap;
       breakableObstacleArr.forEach((breakableObstacle) => {
         if (!breakableObstacleMap.has(breakableObstacle.id)) {
-          const sprite = scene.add
+          const sprite: Phaser.GameObjects.Sprite = scene.add
             .sprite(
               breakableObstacle.x,
               breakableObstacle.y,
@@ -128,13 +134,13 @@ export class SyncUtil {
     }
   }
 
-  static addBomb(bomb: IBombDTO, scene: Game) {
+  static addBomb(bomb: IBombDTO, scene: Game): void {
     if (!bomb) return;
 
     const bombMap: Map<number, IBomb> = scene.getObjects().bombMap;
     if (bombMap.has(bomb.id)) return;
 
-    const sprite = scene.add
+    const sprite: Phaser.GameObjects.Sprite = scene.add
       .sprite(bomb.x + bomb.size / 2, bomb.y + bomb.size / 2, bomb.spriteKey)
       .setScale(0.6)
       .setOrigin(0.5)
@@ -147,7 +153,7 @@ export class SyncUtil {
       sync: null,
     });
   }
-  static removeBomb(id: number, scene: Game) {
+  static removeBomb(id: number, scene: Game): void {
     const bombMap: Map<number, IBomb> = scene.getObjects().bombMap;
     if (!bombMap.has(id)) return;
 
@@ -157,7 +163,7 @@ export class SyncUtil {
 
     bombMap.delete(id);
   }
-  static removeRemoveBreakableObstacle(id: number, scene: Game) {
+  static removeRemoveBreakableObstacle(id: number, scene: Game): void {
     const breakableObstacleMap: Map<number, IBreakableObstacle> =
       scene.getObjects().breakableObstacleMap;
     if (!breakableObstacleMap.has(id)) return;
@@ -176,7 +182,7 @@ export class SyncUtil {
     const itemMap: Map<number, IItem> = scene.getObjects().itemMap;
     if (itemMap.has(item.id)) return;
 
-    const sprite = scene.add
+    const sprite: Phaser.GameObjects.Sprite = scene.add
       .sprite(item.x + item.size / 2, item.y + item.size / 2, item.spriteKey)
       .setScale(0.8)
       .setOrigin(0.5);
@@ -186,7 +192,7 @@ export class SyncUtil {
       sync: null,
     });
   }
-  static removeItem(id: number, scene: Game) {
+  static removeItem(id: number, scene: Game): void {
     const itemMap: Map<number, IItem> = scene.getObjects().itemMap;
     if (!itemMap.has(id)) return;
 
@@ -197,12 +203,12 @@ export class SyncUtil {
     itemMap.delete(id);
   }
 
-  static addMarkers(markerArr: IMarkerDTO[], scene: Game) {
+  static addMarkers(markerArr: IMarkerDTO[], scene: Game): void {
     if (markerArr && markerArr.length > 0) {
       const markerMap: Map<number, IMarker> = scene.getObjects().markerMap;
       markerArr.forEach((marker: IMarkerDTO) => {
         if (!markerMap.has(marker.id)) {
-          const sprite = scene.add
+          const sprite: Phaser.GameObjects.Sprite = scene.add
             .sprite(
               marker.x + marker.size / 2,
               marker.y + marker.size / 2,
@@ -219,7 +225,7 @@ export class SyncUtil {
       });
     }
   }
-  static removeMarkers(idArr: number[], scene: Game) {
+  static removeMarkers(idArr: number[], scene: Game): void {
     if (idArr && idArr.length > 0) {
       const markerMap: Map<number, IMarker> = scene.getObjects().markerMap;
       idArr.forEach((id: number) => {
@@ -233,7 +239,7 @@ export class SyncUtil {
       });
     }
   }
-  static addExplosions(explosionArr: IExplosionDTO[], scene: Game) {
+  static addExplosions(explosionArr: IExplosionDTO[], scene: Game): void {
     if (explosionArr && explosionArr.length > 0) {
       const explosionMap: Map<number, IExplosion> =
         scene.getObjects().explosionMap;
@@ -255,7 +261,7 @@ export class SyncUtil {
       });
     }
   }
-  static removeExplosions(idArr: number[], scene: Game) {
+  static removeExplosions(idArr: number[], scene: Game): void {
     if (idArr && idArr.length > 0) {
       const explosionMap: Map<number, IExplosion> =
         scene.getObjects().explosionMap;
@@ -271,13 +277,13 @@ export class SyncUtil {
     }
   }
 
-  static addCharacters(characterArr: ICharacterDTO[], scene: Game) {
+  static addCharacters(characterArr: ICharacterDTO[], scene: Game): void {
     if (characterArr && characterArr.length > 0) {
       const characterMap: Map<number, ICharacter> =
         scene.getObjects().characterMap;
       characterArr.forEach((character: ICharacterDTO) => {
         if (!characterMap.has(character.id)) {
-          const sprite = scene.add
+          const sprite: Phaser.GameObjects.Sprite = scene.add
             .sprite(character.x, character.y, character.spriteKey)
             .setScale(1.0)
             .setOrigin(0)
@@ -291,7 +297,10 @@ export class SyncUtil {
             rightGauge: Phaser.GameObjects.Graphics;
           } = SyncUtil.createLifeGauge(character, scene);
 
-          const nameText = SyncUtil.createNameText(character, scene);
+          const nameText: Phaser.GameObjects.Text = SyncUtil.createNameText(
+            character,
+            scene
+          );
 
           characterMap.set(character.id, {
             sprite: sprite,
@@ -335,19 +344,19 @@ export class SyncUtil {
     leftGauge: Phaser.GameObjects.Graphics;
     rightGauge: Phaser.GameObjects.Graphics;
   } {
-    const cellWidth = character.size / character.initStock;
-    const sx = character.x;
-    const sy = character.y - 20;
+    const cellWidth: number = character.size / character.initStock;
+    const sx: number = character.x;
+    const sy: number = character.y - 20;
 
-    let color = 0x00ff00;
+    let color: number = 0x00ff00;
     if (character.stock <= character.initStock / 3) {
       color = 0xff0000;
     }
-    const leftGauge = scene.add
+    const leftGauge: Phaser.GameObjects.Graphics = scene.add
       .graphics()
       .fillStyle(color)
       .fillRect(sx, sy, cellWidth * character.stock, 5);
-    const rightGauge = scene.add
+    const rightGauge: Phaser.GameObjects.Graphics = scene.add
       .graphics()
       .fillStyle(0x998877)
       .fillRect(
@@ -359,7 +368,7 @@ export class SyncUtil {
     return { leftGauge, rightGauge };
   }
 
-  static updateCharacter(scene: Game) {
+  static updateCharacter(scene: Game): void {
     //syncのデータを基に、spriteの座標とアニメーションを更新
     const characterMap: Map<number, ICharacter> =
       scene.getObjects().characterMap;
@@ -376,7 +385,10 @@ export class SyncUtil {
 
         character.nameText = SyncUtil.createNameText(character.sync, scene);
 
-        const lifeGauge = SyncUtil.createLifeGauge(character.sync, scene);
+        const lifeGauge: {
+          leftGauge: Phaser.GameObjects.Graphics;
+          rightGauge: Phaser.GameObjects.Graphics;
+        } = SyncUtil.createLifeGauge(character.sync, scene);
 
         character.leftGauge = lifeGauge.leftGauge;
         character.rightGauge = lifeGauge.rightGauge;
@@ -390,7 +402,7 @@ export class SyncUtil {
       });
     }
   }
-  static flashCharacter(id: number, scene: Game) {
+  static flashCharacter(id: number, scene: Game): void {
     const characterMap: Map<number, ICharacter> =
       scene.getObjects().characterMap;
     if (!characterMap.has(id)) return;
@@ -417,7 +429,7 @@ export class SyncUtil {
       repeat: repeat,
     });
   }
-  static removeCharacter(id: number, scene: Game) {
+  static removeCharacter(id: number, scene: Game): void {
     const characterMap: Map<number, ICharacter> =
       scene.getObjects().characterMap;
     if (!characterMap.has(id)) return;
@@ -431,5 +443,4 @@ export class SyncUtil {
 
     characterMap.delete(id);
   }
-  
 }

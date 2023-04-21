@@ -1,9 +1,8 @@
-import { Scene } from 'phaser';
 import Constant from '../../../server/src/constant';
 
 export default class AnimationUtil {
   //背景
-  static createBackgroundAnim(anims: Phaser.Animations.AnimationManager) {
+  static createBackgroundAnim(anims: Phaser.Animations.AnimationManager): void {
     anims.create({
       key: Constant.BACKGROUND,
       frames: anims.generateFrameNumbers(Constant.BACKGROUND, {
@@ -16,7 +15,7 @@ export default class AnimationUtil {
   }
 
   //猫
-  static createCatAnim(anims: Phaser.Animations.AnimationManager) {
+  static createCatAnim(anims: Phaser.Animations.AnimationManager): void {
     for (const value of Object.values(Constant.CAT)) {
       anims.create({
         key: `${value}-left`,
@@ -66,7 +65,7 @@ export default class AnimationUtil {
     }
   }
 
-  static createBombAnim(anims: Phaser.Animations.AnimationManager) {
+  static createBombAnim(anims: Phaser.Animations.AnimationManager): void {
     anims.create({
       key: `${Constant.ATTACK.BOMB}-anim`,
       frameRate: 10,
@@ -78,7 +77,7 @@ export default class AnimationUtil {
     });
   }
 
-  static createExplosionAnim(anims: Phaser.Animations.AnimationManager) {
+  static createExplosionAnim(anims: Phaser.Animations.AnimationManager): void {
     anims.create({
       key: `${Constant.ATTACK.EXPLOSION}-anim`,
       frameRate: 10,
@@ -90,7 +89,7 @@ export default class AnimationUtil {
     });
   }
 
-  static createFlowerAnim(anims: Phaser.Animations.AnimationManager) {
+  static createFlowerAnim(anims: Phaser.Animations.AnimationManager): void {
     for (const value of Object.values(Constant.FLOWER)) {
       anims.create({
         key: `${value}-anim`,
@@ -102,7 +101,7 @@ export default class AnimationUtil {
       });
     }
   }
-  static createGrassAnim(anims: Phaser.Animations.AnimationManager) {
+  static createGrassAnim(anims: Phaser.Animations.AnimationManager): void {
     for (const value of Constant.GRASS) {
       anims.create({
         key: `${value}-anim`,
@@ -114,7 +113,7 @@ export default class AnimationUtil {
       });
     }
   }
-  static createWaterAnim(anims: Phaser.Animations.AnimationManager) {
+  static createWaterAnim(anims: Phaser.Animations.AnimationManager): void {
     for (const value of Constant.WATER) {
       anims.create({
         key: `${value}-anim`,
@@ -131,7 +130,7 @@ export default class AnimationUtil {
     sprite: Phaser.GameObjects.Sprite,
     animation: string,
     direction: number
-  ) {
+  ): void {
     if (!sprite.anims.isPlaying) sprite.play(animation);
     else if (sprite.anims.getName() !== animation) sprite.play(animation);
     //右方向の場合は左方向の動きを反転させる
@@ -141,12 +140,15 @@ export default class AnimationUtil {
   static setEdgeObstacleAnim(
     sprite: Phaser.GameObjects.Sprite,
     animation: string
-  ) {
+  ): void {
     if (!sprite.anims.isPlaying) sprite.play({ key: animation, repeat: -1 });
     else if (sprite.anims.getName() !== animation)
       sprite.play({ key: animation, repeat: -1 });
   }
-  static setGroundAnim(sprite: Phaser.GameObjects.Sprite, animation: string) {
+  static setGroundAnim(
+    sprite: Phaser.GameObjects.Sprite,
+    animation: string
+  ): void {
     if (!sprite.anims.isPlaying) sprite.play({ key: animation, repeat: -1 });
     else if (sprite.anims.getName() !== animation)
       sprite.play({ key: animation, repeat: -1 });
@@ -155,14 +157,14 @@ export default class AnimationUtil {
   static setBombAnim(
     sprite: Phaser.GameObjects.Sprite,
     animation: string
-  ) {
+  ): void {
     if (!sprite.anims.isPlaying) sprite.play(animation);
     else if (sprite.anims.getName() !== animation) sprite.play(animation);
   }
   static setExplosionAnim(
     sprite: Phaser.GameObjects.Sprite,
     animation: string
-  ) {
+  ): void {
     if (!sprite.anims.isPlaying) sprite.play(animation);
     else if (sprite.anims.getName() !== animation) sprite.play(animation);
   }
