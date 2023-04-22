@@ -13,6 +13,7 @@ import { UserDTO } from 'src/game/dtos/UserDTO';
 import { Game } from 'src/game/models/Game';
 import { Room } from 'src/game/models/Room';
 import { RoomService } from 'src/room/room.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 @WebSocketGateway({
@@ -40,12 +41,16 @@ export class EventsGateway {
 
   //クライアント接続時
   handleConnection(@ConnectedSocket() socket: Socket, ...args: any[]): void {
-    this.logger.log(`Client connected: ${socket.id}`);
+    const id = socket.handshake.query.id || socket.id;
+    socket.handshake.query.id = id; // IDをセット
+    this.logger.log(`Client connected: ${socket.handshake.query.id}`);
+    // this.logger.log(`Client connected: ${socket.id}`);
   }
 
   //クライアント切断時
   async handleDisconnect(@ConnectedSocket() socket: Socket): Promise<void> {
-    this.logger.log(`Client disconnected: ${socket.id}`);
+    this.logger.log(`Client disconnected: ${socket.handshake.query.id}`);
+    // this.logger.log(`Client disconnected: ${socket.id}`);
     //disconnectイベント発生時に、socket.leave()が自動的に行われる
 
     //対戦ルームから退室する
@@ -192,7 +197,7 @@ export class EventsGateway {
         left: boolean;
       };
     },
-  ):void {
+  ): void {
     this.roomService.movePlayer(socket, data.movement);
   }
 

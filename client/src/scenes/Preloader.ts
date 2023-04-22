@@ -11,11 +11,13 @@ export default class Preloader extends Scene {
   }
 
   public init(): void {
-    const socket = io(`${import.meta.env.VITE_API_URL}`);
+    const socket: Socket = io(`${import.meta.env.VITE_API_URL}`);
     this.socket = socket;
 
     socket.on('connect', function () {
       console.log('サーバーとソケット接続しました。');
+      socket.io.opts.query = { id: socket.id };
+      localStorage.setItem('socketId', socket.id);
     });
   }
 
