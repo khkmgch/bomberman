@@ -114,6 +114,7 @@ export default class Game extends Scene {
 
   /* socket - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
   private addSocketListeners(): void {
+    this.onDisconnect();
     this.onGetInitialState();
     this.onSyncState();
     this.onSyncTime();
@@ -150,6 +151,15 @@ export default class Game extends Scene {
     this.offSyncItems();
     this.offCountDown();
     this.offFinished();
+  }
+  private onDisconnect(): void {
+    this.socket.on('disconnect', () => {
+      console.log('サーバーとの接続が切れました。再接続を試みます。');
+      this.socket.io.opts.query = { id: this.socket.id }; // IDをセットして再接続
+      this.socket.connect();
+
+      this.addSocketListeners();
+    });
   }
 
   private onGetInitialState(): void {
