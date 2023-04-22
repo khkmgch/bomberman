@@ -120,15 +120,18 @@ export class RoomService {
     //ルームがない場合
     if (!this.roomExists(roomId)) return { success: false };
 
-    const room = this.roomMap.get(roomId);
+    const room: Room = this.roomMap.get(roomId);
     //ルームが削除中の場合
     if (room.getIsRemoving()) return { success: false };
 
     //ユーザーが存在しない場合
     if (!room.hasUser(socket.id)) return { success: false };
 
-    //ユーザーを削除
-    this.removeUser(socket, roomId);
+    //ゲーム開始していない場合
+    if (room.getGame() === null) {
+      //ユーザーを削除
+      this.removeUser(socket, roomId);
+    }
 
     //鍵がかかっている場合は、開錠する
     if (
