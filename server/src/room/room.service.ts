@@ -383,7 +383,9 @@ export class RoomService {
           throw new Error('Game not found');
         }
       } else {
-        throw new Error('User not found');
+        // throw new Error('User not found');
+        console.log('User not found');
+        return;
       }
     } catch (error) {
       console.error(error);
