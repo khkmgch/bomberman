@@ -11,14 +11,15 @@ export default class Preloader extends Scene {
   }
 
   public init(): void {
-    const socket: Socket = io(`${import.meta.env.VITE_API_URL}`);
+    const clientId: string | null = localStorage.getItem('clientId');
+    const socket: Socket = io(`${import.meta.env.VITE_API_URL}`, {
+      query: {
+        clientId: clientId || null, // localStorageにclientIdが存在しない場合はnullを送信
+      },
+    });
     this.socket = socket;
 
-    socket.on('connect', function () {
-      console.log('サーバーとソケット接続しました。');
-      socket.io.opts.query = { id: socket.id };
-      localStorage.setItem('socketId', socket.id);
-    });
+    this.addSocketListenters();
   }
 
   public preload(): void {
@@ -121,8 +122,41 @@ export default class Preloader extends Scene {
     AnimationUtil.createGrassAnim(this.anims);
     AnimationUtil.createWaterAnim(this.anims);
 
+    this.removeSocketListeners();
+
     this.scene.start(Constant.SCENE.TITLE, {
       socket: this.socket,
     });
+  }
+
+  /* Socket - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+  private addSocketListenters(): void {
+    this.onClientId();
+    this.onConnect();
+  }
+  private removeSocketListeners(): void {
+    this.offClientId();
+    this.offConnect();
+  }
+  private onClientId(): void {
+    // サーバーからclientIdを受信した際の処理
+    this.socket.on('ClientId', (data: { clientId: string }) => {
+      console.log('Server sent clientId:', data.clientId);
+
+      // 受信したclientIdをlocalStorageに保存
+      localStorage.setItem('clientId', data.clientId);
+    });
+  }
+  private offClientId(): void {
+    this.socket.off('ClientId');
+  }
+  private onConnect(): void {
+    this.socket.on('connect', function () {
+      console.log('サーバーとソケット接続しました。');
+    });
+  }
+  private offConnect(): void {
+    this.socket.off('connect');
   }
 }

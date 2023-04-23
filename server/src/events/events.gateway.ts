@@ -39,18 +39,26 @@ export class EventsGateway {
     }, 500);
   }
 
+  @SubscribeMessage('connect')
   //クライアント接続時
   handleConnection(@ConnectedSocket() socket: Socket, ...args: any[]): void {
-    const id = socket.handshake.query.id || socket.id;
-    socket.handshake.query.id = id; // IDをセット
-    this.logger.log(`Client connected: ${socket.handshake.query.id}`);
-    // this.logger.log(`Client connected: ${socket.id}`);
+    const clientId: string =
+      socket.handshake.query.clientId !== 'null'
+        ? Array.isArray(socket.handshake.query.clientId)
+          ? socket.handshake.query.clientId.join('')
+          : socket.handshake.query.clientId
+        : uuidv4();
+    socket.handshake.query.clientId = clientId; // IDをセット
+    socket.clientId = clientId;
+    this.logger.log(`Client connected: ${socket.handshake.query.clientId}`);
+
+    // clientIdを送信
+    socket.emit('ClientId', { clientId });
   }
 
   //クライアント切断時
   async handleDisconnect(@ConnectedSocket() socket: Socket): Promise<void> {
-    this.logger.log(`Client disconnected: ${socket.handshake.query.id}`);
-    // this.logger.log(`Client disconnected: ${socket.id}`);
+    this.logger.log(`Client disconnected: ${socket.handshake.query.clientId}`);
     //disconnectイベント発生時に、socket.leave()が自動的に行われる
 
     //対戦ルームから退室する
@@ -94,7 +102,7 @@ export class EventsGateway {
 
     const host = room.getHost();
     let isHost = false;
-    if (socket.id === host.getSocket().id) isHost = true;
+    if (socket.clientId === host.getSocket().clientId) isHost = true;
 
     return { success: success, room: room.toDTO(), isHost: isHost };
   }
@@ -124,7 +132,10 @@ export class EventsGateway {
     @ConnectedSocket() socket: Socket,
     @MessageBody() data: { roomId: string },
   ): void {
-    const user: UserDTO = this.roomService.getUserDTO(socket.id, data.roomId);
+    const user: UserDTO = this.roomService.getUserDTO(
+      socket.clientId,
+      data.roomId,
+    );
     this.server.in(socket.roomId).emit('UpsertUser', { user: user });
   }
 
@@ -175,7 +186,10 @@ export class EventsGateway {
 
     let interval: NodeJS.Timer = setInterval(() => {
       if (this.roomService.checkAllPlayersPlaying(socket)) {
-        const game = this.roomService.getRoomMap().get(socket.roomId).getGame();
+        const game: Game = this.roomService
+          .getRoomMap()
+          .get(socket.roomId)
+          .getGame();
         this.server.emit('GetInitialState', game.getStage().getInitialState());
         setTimeout(() => {
           game.startCountDown();

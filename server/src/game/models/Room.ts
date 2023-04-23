@@ -47,7 +47,7 @@ export class Room {
   }
 
   public setUser(user: User): void {
-    this.userMap.set(user.getSocket().id, user);
+    this.userMap.set(user.getSocket().clientId, user);
   }
   public setGame(game: Game): void {
     this.game = game;
@@ -59,7 +59,7 @@ export class Room {
     this.isLocked = isLocked;
   }
 
-  public hasUser(socketId: string): boolean {
-    return this.userMap.has(socketId);
+  public hasUser(clientId: string): boolean {
+    return this.userMap.has(clientId);
   }
 }
