@@ -429,6 +429,7 @@ export class RoomService {
     result: CharacterDTO[];
   } {
     try {
+      console.log('socket : ', socket);
       if (this.userExists(socket.roomId, socket.clientId)) {
         const room: Room = this.getRoomMap().get(socket.roomId);
         const game: Game = room.getGame();
