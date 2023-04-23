@@ -307,6 +307,7 @@ export default class Lobby extends Scene {
           if (Guards.isJoinRoomDTO(response)) {
             if (response.success) {
               this.socket.roomId = response.room.id;
+              localStorage.setItem('roomId', response.room.id);
 
               this.diableButtons();
               const { centerX, centerY } = this.cameras.main;
