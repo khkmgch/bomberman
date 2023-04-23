@@ -52,6 +52,18 @@ export class EventsGateway {
     socket.clientId = clientId;
     this.logger.log(`Client connected: ${socket.handshake.query.clientId}`);
 
+    //再接続の場合
+    const queryRoomId: string | string[] = socket.handshake.query.roomId;
+    if (queryRoomId) {
+      const roomId: string = Array.isArray(queryRoomId)
+        ? queryRoomId.join('')
+        : queryRoomId;
+      if (this.roomService.roomExists(roomId)) {
+        const room: Room = this.roomService.getRoomMap().get(roomId);
+        socket.join(room.getId());
+      }
+    }
+
     // clientIdを送信
     socket.emit('ClientId', { clientId });
   }

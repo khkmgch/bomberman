@@ -159,10 +159,11 @@ export default class Game extends Scene {
     this.socket.on('disconnect', () => {
       console.log('サーバーとの接続が切れました。再接続を試みます。');
       const clientId: string | null = localStorage.getItem('clientId');
-      if (!clientId) {
+      const roomId: string | null = localStorage.getItem('roomId');
+      if (!clientId || roomId) {
         location.reload();
       }
-      this.socket.io.opts.query = { clientId: clientId }; // IDをセットして再接続
+      this.socket.io.opts.query = { clientId: clientId, roomId: roomId }; // IDをセットして再接続
       this.socket.connect();
 
       this.addSocketListeners();
