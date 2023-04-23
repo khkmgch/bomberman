@@ -13,7 +13,7 @@ export class User {
 
   public toDTO(): UserDTO {
     return {
-      socketId: this.getSocket().id,
+      clientId: this.getSocket().clientId,
       id: this.getId(),
       userName: this.getUserName(),
       state: this.getState(),

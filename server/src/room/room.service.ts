@@ -49,10 +49,10 @@ export class RoomService {
     return users;
   }
   //特定のユーザーを返す
-  getUserDTO(socketId: string, roomId: string): UserDTO {
-    if (!this.userExists(roomId, socketId)) return null;
+  getUserDTO(clientId: string, roomId: string): UserDTO {
+    if (!this.userExists(roomId, clientId)) return null;
 
-    return this.roomMap.get(roomId).getUserMap().get(socketId).toDTO();
+    return this.roomMap.get(roomId).getUserMap().get(clientId).toDTO();
   }
   //ルームを作成
   async createRoom(socket: Socket, userName: string): Promise<Room> {
@@ -89,7 +89,7 @@ export class RoomService {
           return { room, success: false };
 
         //ユーザーが既に存在する場合
-        if (room.hasUser(socket.id)) return { room, success: false };
+        if (room.hasUser(socket.clientId)) return { room, success: false };
 
         //ユーザーを追加
         this.addUser(socket, userName, room);
@@ -125,7 +125,7 @@ export class RoomService {
     if (room.getIsRemoving()) return { success: false };
 
     //ユーザーが存在しない場合
-    if (!room.hasUser(socket.id)) return { success: false };
+    if (!room.hasUser(socket.clientId)) return { success: false };
 
     //ゲーム開始していない場合
     if (room.getGame() === null) {
@@ -144,7 +144,7 @@ export class RoomService {
 
     //ユーザーがルームのホストの場合、ルームを削除する
     if (
-      socket.id === room.getHost().getSocket().id &&
+      socket.clientId === room.getHost().getSocket().clientId &&
       room.getGame() === null
     ) {
       socket.in(roomId).emit('CloseRoomDialog');
@@ -204,28 +204,31 @@ export class RoomService {
 
   //ルームからユーザーを削除
   removeUser(socket: Socket, roomId: string): void {
-    const user: User = this.roomMap.get(roomId).getUserMap().get(socket.id);
+    const user: User = this.roomMap
+      .get(roomId)
+      .getUserMap()
+      .get(socket.clientId);
     socket.emit('RemoveUser', { user: user.toDTO() });
     socket.in(roomId).emit('RemoveUser', { user: user.toDTO() });
 
     //ユーザーをRoomsから外す
     socket.leave(roomId);
     socket.roomId = '';
-    if (!this.userExists(roomId, socket.id)) return;
+    if (!this.userExists(roomId, socket.clientId)) return;
 
     //ルームのuserMapから削除
-    this.roomMap.get(roomId).getUserMap().delete(socket.id);
+    this.roomMap.get(roomId).getUserMap().delete(socket.clientId);
   }
 
   //ゲーム開始の準備
   readyToStartGame(socket: Socket): UserDTO {
     try {
       if (socket.roomId !== '') {
-        if (this.userExists(socket.roomId, socket.id)) {
-          const user = this.roomMap
+        if (this.userExists(socket.roomId, socket.clientId)) {
+          const user: User = this.roomMap
             .get(socket.roomId)
             .getUserMap()
-            .get(socket.id);
+            .get(socket.clientId);
           user.setState(Constant.PLAYER_STATE.READY);
           return user.toDTO();
         } else {
@@ -243,11 +246,11 @@ export class RoomService {
   readyToReceiveGame(socket: Socket) {
     try {
       if (socket.roomId !== '') {
-        if (this.userExists(socket.roomId, socket.id)) {
-          const user = this.roomMap
+        if (this.userExists(socket.roomId, socket.clientId)) {
+          const user: User = this.roomMap
             .get(socket.roomId)
             .getUserMap()
-            .get(socket.id);
+            .get(socket.clientId);
           user.setState(Constant.PLAYER_STATE.PLAYING);
         } else {
           throw new Error('User not found');
@@ -306,7 +309,7 @@ export class RoomService {
     try {
       if (roomId !== '') {
         if (this.roomExists(roomId)) {
-          const room = this.roomMap.get(roomId);
+          const room: Room = this.roomMap.get(roomId);
           for (const user of room.getUserMap()) {
             user[1].getSocket().leave('lobby');
           }
@@ -323,11 +326,11 @@ export class RoomService {
   }
 
   //ルーム内に特定のユーザーが存在するかどうか
-  userExists(roomId: string, socketId: string): boolean {
+  userExists(roomId: string, clientId: string): boolean {
     return (
       this.roomExists(roomId) &&
       this.roomMap.get(roomId).getUserMap() &&
-      this.roomMap.get(roomId).getUserMap().has(socketId)
+      this.roomMap.get(roomId).getUserMap().has(clientId)
     );
   }
   //特定のルームが存在するかどうか
@@ -357,9 +360,9 @@ export class RoomService {
     },
   ): void {
     try {
-      if (this.userExists(socket.roomId, socket.id)) {
+      if (this.userExists(socket.roomId, socket.clientId)) {
         const room: Room = this.getRoomMap().get(socket.roomId);
-        const user: User = room.getUserMap().get(socket.id);
+        const user: User = room.getUserMap().get(socket.clientId);
         const game: Game = room.getGame();
         if (game) {
           if (game.getIsAcceptingInput()) {
@@ -390,9 +393,9 @@ export class RoomService {
   //爆弾を設置する
   putBomb(socket: Socket): void {
     try {
-      if (this.userExists(socket.roomId, socket.id)) {
+      if (this.userExists(socket.roomId, socket.clientId)) {
         const room: Room = this.getRoomMap().get(socket.roomId);
-        const user: User = room.getUserMap().get(socket.id);
+        const user: User = room.getUserMap().get(socket.clientId);
         const game: Game = room.getGame();
         if (game) {
           if (game.getIsAcceptingInput()) {
@@ -424,7 +427,7 @@ export class RoomService {
     result: CharacterDTO[];
   } {
     try {
-      if (this.userExists(socket.roomId, socket.id)) {
+      if (this.userExists(socket.roomId, socket.clientId)) {
         const room: Room = this.getRoomMap().get(socket.roomId);
         const game: Game = room.getGame();
         if (game) {
@@ -469,7 +472,7 @@ export class RoomService {
       if (room.getIsRemoving()) return { success: false };
 
       //ユーザーが存在しない場合
-      if (!room.hasUser(socket.id)) return { success: false };
+      if (!room.hasUser(socket.clientId)) return { success: false };
 
       //ユーザーを削除
       this.removeUser(socket, socket.roomId);

@@ -116,6 +116,8 @@ export default class Lobby extends Scene {
 
   /* Socket - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
   private addSocketListeners(): void {
+    this.onDisconnect();
+    this.onClientId();
     this.onGetRooms();
     this.onCloseRoomDialog();
     this.onUpsertUser();
@@ -123,11 +125,42 @@ export default class Lobby extends Scene {
     this.onLeaveLobby();
   }
   private removeSocketListeners(): void {
+    this.offDisconnect();
+    this.offClientId();
     this.offGetRooms();
     this.offCloseRoomDialog();
     this.offUpsertUser();
     this.offRemoveUser();
     this.offLeaveLobby();
+  }
+
+  private onDisconnect(): void {
+    this.socket.on('disconnect', () => {
+      console.log('サーバーとの接続が切れました。再接続を試みます。');
+      const clientId: string | null = localStorage.getItem('clientId');
+      if (!clientId) {
+        location.reload();
+      }
+      this.socket.io.opts.query = { clientId: clientId }; // IDをセットして再接続
+      this.socket.connect();
+
+      this.addSocketListeners();
+    });
+  }
+  private offDisconnect(): void {
+    this.socket.off('disconnect');
+  }
+  private onClientId(): void {
+    // サーバーからclientIdを受信した際の処理
+    this.socket.on('ClientId', (data: { clientId: string }) => {
+      console.log('Server sent clientId:', data.clientId);
+
+      // 受信したclientIdをlocalStorageに保存
+      localStorage.setItem('clientId', data.clientId);
+    });
+  }
+  private offClientId(): void {
+    this.socket.off('ClientId');
   }
 
   private onGetRooms(): void {
@@ -217,8 +250,8 @@ export default class Lobby extends Scene {
     if (rooms.length <= 0) {
       rooms.push({
         id: '0',
-        host: { socketId: '0', userName: '', id: -1, state: '' },
-        users: [{ socketId: '0', userName: '', id: -1, state: '' }],
+        host: { clientId: '0', userName: '', id: -1, state: '' },
+        users: [{ clientId: '0', userName: '', id: -1, state: '' }],
         numUsers: 0,
         maxUsers: 0,
       });

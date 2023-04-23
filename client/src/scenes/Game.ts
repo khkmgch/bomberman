@@ -115,6 +115,7 @@ export default class Game extends Scene {
   /* socket - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
   private addSocketListeners(): void {
     this.onDisconnect();
+    this.onClientId();
     this.onGetInitialState();
     this.onSyncState();
     this.onSyncTime();
@@ -134,6 +135,8 @@ export default class Game extends Scene {
     this.onFinished();
   }
   private removeSocketListeners(): void {
+    this.offDisconnect();
+    this.offClientId();
     this.offGetInitialState();
     this.offSyncState();
     this.offSyncTime();
@@ -155,11 +158,30 @@ export default class Game extends Scene {
   private onDisconnect(): void {
     this.socket.on('disconnect', () => {
       console.log('サーバーとの接続が切れました。再接続を試みます。');
-      this.socket.io.opts.query = { id: this.socket.id }; // IDをセットして再接続
+      const clientId: string | null = localStorage.getItem('clientId');
+      if (!clientId) {
+        location.reload();
+      }
+      this.socket.io.opts.query = { clientId: clientId }; // IDをセットして再接続
       this.socket.connect();
 
       this.addSocketListeners();
     });
+  }
+  private offDisconnect(): void {
+    this.socket.off('disconnect');
+  }
+  private onClientId(): void {
+    // サーバーからclientIdを受信した際の処理
+    this.socket.on('ClientId', (data: { clientId: string }) => {
+      console.log('Server sent clientId:', data.clientId);
+
+      // 受信したclientIdをlocalStorageに保存
+      localStorage.setItem('clientId', data.clientId);
+    });
+  }
+  private offClientId(): void {
+    this.socket.off('ClientId');
   }
 
   private onGetInitialState(): void {

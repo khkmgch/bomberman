@@ -30,8 +30,8 @@ export class Guards {
   }
   static isIUserDTO(obj: any): obj is IUserDTO {
     return (
-      'socketId' in obj &&
-      typeof obj.socketId === 'string' &&
+      'clientId' in obj &&
+      typeof obj.clientId === 'string' &&
       'id' in obj &&
       typeof obj.id === 'number' &&
       'userName' in obj &&

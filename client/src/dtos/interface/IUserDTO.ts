@@ -1,5 +1,5 @@
 export interface IUserDTO {
-  socketId: string;
+  clientId: string;
   id: number;
   userName: string;
   state: string

@@ -12,7 +12,7 @@ export default class Title extends Scene {
 
   public init(data: { socket: Socket }): void {
     this.socket = data.socket;
-    // console.log(`id : ${this.socket.id}`);
+    this.addSocketListeners();
   }
 
   public create(): void {
@@ -47,6 +47,7 @@ export default class Title extends Scene {
   }
 
   private startLobby(): void {
+    this.removeSocketListeners();
     this.scene.start(Constant.SCENE.LOBBY, {
       socket: this.socket,
     });
@@ -60,5 +61,43 @@ export default class Title extends Scene {
 
     // オブジェクトの削除
     this.children.removeAll(true);
+  }
+  private addSocketListeners(): void {
+    this.onDisconnect();
+    this.onClientId();
+  }
+  private removeSocketListeners(): void {
+    this.offClientId();
+    this.offDisConnect();
+  }
+
+  private onDisconnect(): void {
+    this.socket.on('disconnect', () => {
+      console.log('サーバーとの接続が切れました。再接続を試みます。');
+      const clientId: string | null = localStorage.getItem('clientId');
+      if (!clientId) {
+        location.reload();
+      }
+      this.socket.io.opts.query = { clientId: clientId }; // IDをセットして再接続
+      this.socket.connect();
+
+      this.addSocketListeners();
+    });
+  }
+  private onClientId(): void {
+    // サーバーからclientIdを受信した際の処理
+    this.socket.on('ClientId', (data: { clientId: string }) => {
+      console.log('Server sent clientId:', data.clientId);
+
+      // 受信したclientIdをlocalStorageに保存
+      localStorage.setItem('clientId', data.clientId);
+    });
+  }
+  private offClientId(): void {
+    this.socket.off('ClientId');
+  }
+
+  private offDisConnect(): void {
+    this.socket.off('disconnect');
   }
 }

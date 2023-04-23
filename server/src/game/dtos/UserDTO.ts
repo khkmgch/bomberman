@@ -1,5 +1,5 @@
 export class UserDTO {
-  public socketId: string;
+  public clientId: string;
   public id: number;
   public userName: string;
   public state: string;
