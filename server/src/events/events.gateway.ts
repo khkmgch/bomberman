@@ -61,6 +61,7 @@ export class EventsGateway {
       if (this.roomService.roomExists(roomId)) {
         const room: Room = this.roomService.getRoomMap().get(roomId);
         socket.join(room.getId());
+        socket.roomId = roomId;
       }
     }
 
