@@ -24,8 +24,20 @@ export class RoomService {
     return this.roomMap;
   }
 
+  public reconnect(socket: Socket, queryRoomId: string | string[]): void {
+    const roomId: string = Array.isArray(queryRoomId)
+      ? queryRoomId.join('')
+      : queryRoomId;
+    if (this.roomExists(roomId)) {
+      const room: Room = this.getRoomMap().get(roomId);
+      socket.join(room.getId());
+      // IDをセット
+      socket.roomId = roomId;
+    }
+  }
+
   //入室可能な全ルームを返す
-  getAvailableRoomDTOs(): RoomDTO[] {
+  public getAvailableRoomDTOs(): RoomDTO[] {
     let rooms: RoomDTO[] = [];
     this.roomMap.forEach((room) => {
       if (!room.getIsRemoving() && !room.getIsLocked()) {
@@ -35,7 +47,7 @@ export class RoomService {
     return rooms;
   }
   //ルーム内の全ユーザーを返す
-  getRoomUserDTOs(roomId: string): UserDTO[] {
+  public getRoomUserDTOs(roomId: string): UserDTO[] {
     if (!this.roomExists(roomId)) return null;
 
     const room: Room = this.roomMap.get(roomId);
@@ -49,13 +61,13 @@ export class RoomService {
     return users;
   }
   //特定のユーザーを返す
-  getUserDTO(clientId: string, roomId: string): UserDTO {
+  public getUserDTO(clientId: string, roomId: string): UserDTO {
     if (!this.userExists(roomId, clientId)) return null;
 
     return this.roomMap.get(roomId).getUserMap().get(clientId).toDTO();
   }
   //ルームを作成
-  async createRoom(socket: Socket, userName: string): Promise<Room> {
+  public async createRoom(socket: Socket, userName: string): Promise<Room> {
     try {
       if (userName !== '' && userName.length <= 8) {
         const host: User = new User(socket, 0, userName);
@@ -73,7 +85,7 @@ export class RoomService {
     }
   }
   //入室
-  async joinRoom(
+  public async joinRoom(
     socket: Socket,
     roomId: string,
     userName: string,
@@ -111,7 +123,7 @@ export class RoomService {
   }
 
   //退室
-  async leaveRoom(
+  public async leaveRoom(
     socket: Socket,
     roomId: string,
   ): Promise<{
@@ -155,7 +167,7 @@ export class RoomService {
   }
 
   //ルーム削除
-  async removeRoom(roomId: string): Promise<void> {
+  public async removeRoom(roomId: string): Promise<void> {
     //ルームがない場合
     if (!this.roomExists(roomId)) return;
 
@@ -181,7 +193,7 @@ export class RoomService {
   }
 
   //ルームにユーザーを追加
-  addUser(socket: Socket, userName: string, room: Room): void {
+  public addUser(socket: Socket, userName: string, room: Room): void {
     //ルーム内でのidを割り当てる
     let id: number = 0;
     let map: Map<number, User> = new Map<number, User>();
@@ -203,7 +215,7 @@ export class RoomService {
   }
 
   //ルームからユーザーを削除
-  removeUser(socket: Socket, roomId: string): void {
+  public removeUser(socket: Socket, roomId: string): void {
     const user: User = this.roomMap
       .get(roomId)
       .getUserMap()
@@ -221,7 +233,7 @@ export class RoomService {
   }
 
   //ゲーム開始の準備
-  readyToStartGame(socket: Socket): UserDTO {
+  public readyToStartGame(socket: Socket): UserDTO {
     try {
       if (socket.roomId !== '') {
         if (this.userExists(socket.roomId, socket.clientId)) {
@@ -243,7 +255,7 @@ export class RoomService {
   }
 
   //クライアントがゲーム受信可能になったので、ユーザー状態を更新
-  readyToReceiveGame(socket: Socket) {
+  public readyToReceiveGame(socket: Socket) {
     try {
       if (socket.roomId !== '') {
         if (this.userExists(socket.roomId, socket.clientId)) {
@@ -263,7 +275,7 @@ export class RoomService {
     }
   }
   //ルーム内の全ユーザーがゲームを受信できるかを確認
-  checkAllPlayersPlaying(socket: Socket): boolean {
+  public checkAllPlayersPlaying(socket: Socket): boolean {
     try {
       if (socket.roomId !== '') {
         if (this.roomExists(socket.roomId)) {
@@ -284,7 +296,7 @@ export class RoomService {
   }
 
   //ルーム内の全ユーザーの準備が完了しているかを確認
-  checkAllPlayersReady(socket: Socket): boolean {
+  public checkAllPlayersReady(socket: Socket): boolean {
     try {
       if (socket.roomId !== '') {
         if (this.roomExists(socket.roomId)) {
@@ -305,7 +317,7 @@ export class RoomService {
   }
 
   //ルーム内の全ユーザーをロビーから退室させる
-  async kickUsersFromLobby(roomId: string): Promise<void> {
+  public async kickUsersFromLobby(roomId: string): Promise<void> {
     try {
       if (roomId !== '') {
         if (this.roomExists(roomId)) {
@@ -326,7 +338,7 @@ export class RoomService {
   }
 
   //ルーム内に特定のユーザーが存在するかどうか
-  userExists(roomId: string, clientId: string): boolean {
+  private userExists(roomId: string, clientId: string): boolean {
     return (
       this.roomExists(roomId) &&
       this.roomMap.get(roomId).getUserMap() &&
@@ -334,12 +346,12 @@ export class RoomService {
     );
   }
   //特定のルームが存在するかどうか
-  roomExists(roomId: string): boolean {
+  public roomExists(roomId: string): boolean {
     return this.roomMap && this.roomMap.has(roomId);
   }
 
   //使用されていないルームを削除する
-  removeInactiveRooms(): void {
+  public removeInactiveRooms(): void {
     this.roomMap.forEach((room: Room, roomId: string) => {
       if (room.getUserMap().size <= 0) {
         console.log('room :', room);
@@ -350,7 +362,7 @@ export class RoomService {
   }
 
   //プレイヤーを動かす
-  movePlayer(
+  public movePlayer(
     socket: Socket,
     movement: {
       up: boolean;
@@ -383,9 +395,7 @@ export class RoomService {
           throw new Error('Game not found');
         }
       } else {
-        // throw new Error('User not found');
-        console.log('User not found');
-        return;
+        throw new Error('User not found');
       }
     } catch (error) {
       console.error(error);
@@ -393,7 +403,7 @@ export class RoomService {
   }
 
   //爆弾を設置する
-  putBomb(socket: Socket): void {
+  public putBomb(socket: Socket): void {
     try {
       if (this.userExists(socket.roomId, socket.clientId)) {
         const room: Room = this.getRoomMap().get(socket.roomId);
@@ -425,11 +435,10 @@ export class RoomService {
     }
   }
 
-  getResult(socket: Socket): {
+  public getResult(socket: Socket): {
     result: CharacterDTO[];
   } {
     try {
-      console.log('socket : ', socket);
       if (this.userExists(socket.roomId, socket.clientId)) {
         const room: Room = this.getRoomMap().get(socket.roomId);
         const game: Game = room.getGame();
@@ -463,7 +472,7 @@ export class RoomService {
     }
   }
 
-  leaveResult(socket: Socket): {
+  public leaveResult(socket: Socket): {
     success: boolean;
   } {
     try {

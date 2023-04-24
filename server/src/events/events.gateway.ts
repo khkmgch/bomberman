@@ -12,6 +12,7 @@ import { RoomDTO } from 'src/game/dtos/RoomDTO';
 import { UserDTO } from 'src/game/dtos/UserDTO';
 import { Game } from 'src/game/models/Game';
 import { Room } from 'src/game/models/Room';
+import { User } from 'src/game/models/User';
 import { RoomService } from 'src/room/room.service';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -39,8 +40,8 @@ export class EventsGateway {
     }, 500);
   }
 
-  @SubscribeMessage('connect')
   //クライアント接続時
+  @SubscribeMessage('connect')
   handleConnection(@ConnectedSocket() socket: Socket, ...args: any[]): void {
     const clientId: string =
       socket.handshake.query.clientId !== 'null'
@@ -48,21 +49,15 @@ export class EventsGateway {
           ? socket.handshake.query.clientId.join('')
           : socket.handshake.query.clientId
         : uuidv4();
-    socket.handshake.query.clientId = clientId; // IDをセット
+    // IDをセット
+    socket.handshake.query.clientId = clientId;
     socket.clientId = clientId;
     this.logger.log(`Client connected: ${socket.handshake.query.clientId}`);
 
     //再接続の場合
     const queryRoomId: string | string[] = socket.handshake.query.roomId;
     if (queryRoomId) {
-      const roomId: string = Array.isArray(queryRoomId)
-        ? queryRoomId.join('')
-        : queryRoomId;
-      if (this.roomService.roomExists(roomId)) {
-        const room: Room = this.roomService.getRoomMap().get(roomId);
-        socket.join(room.getId());
-        socket.roomId = roomId;
-      }
+      this.roomService.reconnect(socket, queryRoomId);
     }
 
     // clientIdを送信
@@ -70,6 +65,7 @@ export class EventsGateway {
   }
 
   //クライアント切断時
+  @SubscribeMessage('disconnect')
   async handleDisconnect(@ConnectedSocket() socket: Socket): Promise<void> {
     this.logger.log(`Client disconnected: ${socket.handshake.query.clientId}`);
     //disconnectイベント発生時に、socket.leave()が自動的に行われる
@@ -107,13 +103,10 @@ export class EventsGateway {
     room: RoomDTO;
     isHost: boolean;
   }> {
-    const { room, success } = await this.roomService.joinRoom(
-      socket,
-      data.roomId,
-      data.userName,
-    );
+    const { room, success }: { room: Room; success: boolean } =
+      await this.roomService.joinRoom(socket, data.roomId, data.userName);
 
-    const host = room.getHost();
+    const host: User = room.getHost();
     let isHost = false;
     if (socket.clientId === host.getSocket().clientId) isHost = true;
 
