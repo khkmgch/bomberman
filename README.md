@@ -86,6 +86,7 @@ https://bomberman-fawn.vercel.app/
 ## Draft
 
 ### 全体の流れ
+![flow](assets/flow.png)
 ### Wireframe
 ![wireframe](assets/wireframe1.png)
 ![wireframe](assets/wireframe2.png)
