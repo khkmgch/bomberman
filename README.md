@@ -80,6 +80,8 @@ https://bomberman-fawn.vercel.app/
 ### ③拡張性
 継続的に開発してバージョンアップできるよう、OOPやAbstractFactoryパターンを用いて実装しました。
 
+![uml](assets/stage.drawio.png)
+
 ### ④UI
 ほっこりするようなデザインの素材を使い、一部素材は自作しました。
 
