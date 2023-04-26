@@ -23,35 +23,36 @@ https://bomberman-fawn.vercel.app/
 
 小規模ですがそのような場所を提供するための第一歩になると考え、作成に至りました。
 ## 使用技術
+
+![tech](assets/tech.drawio.png)
 ### 開発
 - Docker / Docker Compose
+- Typescript
 - Vite
 ### バックエンド
 - NestJS(NodeJS)
-- Typescript
 ### フロントエンド
-- Typescript
 - Phaser3
 ### 通信
 - Socket.io
 ### CI/CD
-##### バックエンド
-- Google Cloud Build
-- Google Cloud Run
-##### フロントエンド
-- Vercel
+- バックエンド
+  - Google Cloud Build
+  - Google Cloud Run
+- フロントエンド
+  - Vercel
 ## こだわった箇所
 ### ①Npcのアルゴリズム
 ゲームの難易度を上げて面白くするために、
 
 周囲の状況を基に最適な行動を選択する敵キャラを実装しました。
-#### Npcの行動
+#### <Npcの行動>
 - 爆弾を回避
 - プレイヤーを攻撃
 - アイテムを取得
 - 障害物を破壊
 
-#### 経路探索に活用したアルゴリズム
+#### <経路探索に活用したアルゴリズム>
 - **ダイクストラ法**
 
 障害物を考慮して、Npcが移動できる範囲をO(n)で探索するため、後述の優先度付きキューを活用したダイクストラ法を用いました。
@@ -62,9 +63,13 @@ https://bomberman-fawn.vercel.app/
 
 なお、ヒューリスティックコストにはマンハッタン距離に加えて、後述の影響マップの値を用いることで、ステージの状況をより正確に判断できるように工夫しました。
 
+参考: https://2dgames.jp/a-star/
+
 - **優先度付きキュー**
 
 ２分ヒープを用いて、TopをO(1)、PopをO(logn)、InsertをO(logn)で行う優先度付きキューを実装しました。
+
+![priorityqueue](assets/priorityqueue.drawio.png)
 
 - **影響マップ**
 
@@ -72,15 +77,48 @@ https://bomberman-fawn.vercel.app/
 
 例えば、ステージのそれぞれのマスに対して、アイテムとの距離を評価値としてマッピングしたものを作成して使いました。
 
+参考: https://tech.cygames.co.jp/archives/2272/
+
 ### ②通信の仕組み
 リアルタイムに情報を共有することが必要なため、Socket.ioを使用しました。
 
 また、タイムタグを減らすためにゲームの状態をサーバのみで管理し、クライアントは描画とキー入力のみを行うようにしました。
 
+![communication](assets/communication.drawio.png)
+
 ### ③拡張性
 継続的に開発してバージョンアップできるよう、OOPやAbstractFactoryパターンを用いて実装しました。
+
+![uml](assets/stage.drawio.png)
 
 ### ④UI
 ほっこりするようなデザインの素材を使い、一部素材は自作しました。
 
-## 
+## Draft
+
+### 全体の流れ
+![flow](assets/flow.png)
+### Wireframe
+![wireframe](assets/wireframe1.png)
+![wireframe](assets/wireframe2.png)
+
+
+## 苦労した点
+
+### ①Npcのアルゴリズム
+先述の記事を参考にしながら、影響マップやAStarアルゴリズムなどを用いて
+
+最適なターゲットと経路を探索する仕組みを考えるのに時間がかかりました。
+### ②入・退室の処理
+Socket.ioのRoomsという機能を使いました。
+
+通常の入退室に加えて、接続が切れた際に退室させる処理や、更新のない対戦ルームを削除する処理など、
+
+１つ１つ仕組みを考えていきました。
+### ③当たり判定
+爆弾、爆風、アイテムや障害物との当たり判定の仕組みを考えるのに苦労しました。
+
+### ④UI
+Phaser独特の書き方があり、1箇所ずつドキュメントを参照しながら実装したため
+
+時間がかかりました。
