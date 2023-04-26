@@ -36,11 +36,11 @@ https://bomberman-fawn.vercel.app/
 ### 通信
 - Socket.io
 ### CI/CD
-##### バックエンド
-- Google Cloud Build
-- Google Cloud Run
-##### フロントエンド
-- Vercel
+- バックエンド
+  - Google Cloud Build
+  - Google Cloud Run
+- フロントエンド
+  - Vercel
 ## こだわった箇所
 ### ①Npcのアルゴリズム
 ゲームの難易度を上げて面白くするために、
