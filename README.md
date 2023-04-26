@@ -23,14 +23,15 @@ https://bomberman-fawn.vercel.app/
 
 小規模ですがそのような場所を提供するための第一歩になると考え、作成に至りました。
 ## 使用技術
+
+![tech](assets/tech.drawio.png)
 ### 開発
 - Docker / Docker Compose
+- Typescript
 - Vite
 ### バックエンド
 - NestJS(NodeJS)
-- Typescript
 ### フロントエンド
-- Typescript
 - Phaser3
 ### 通信
 - Socket.io
