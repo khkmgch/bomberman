@@ -77,6 +77,8 @@ https://bomberman-fawn.vercel.app/
 
 また、タイムタグを減らすためにゲームの状態をサーバのみで管理し、クライアントは描画とキー入力のみを行うようにしました。
 
+![communication](assets/communication.drawio.png)
+
 ### ③拡張性
 継続的に開発してバージョンアップできるよう、OOPやAbstractFactoryパターンを用いて実装しました。
 
