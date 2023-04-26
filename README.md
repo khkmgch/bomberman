@@ -83,4 +83,10 @@ https://bomberman-fawn.vercel.app/
 ### ④UI
 ほっこりするようなデザインの素材を使い、一部素材は自作しました。
 
-## 
+## Draft
+
+### 全体の流れ
+### Wireframe
+![wireframe](assets/wireframe1.png)
+![wireframe](assets/wireframe2.png)
+
