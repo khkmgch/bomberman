@@ -12,6 +12,8 @@ https://bomberman-fawn.vercel.app/
 ↑ → ↓ ← で移動し、SpaceキーでBombを設置できます。
 
 最後まで生き残ると勝利です。
+
+![usage](assets/usage.png)
 ## 作成理由
 
 #### 自己紹介のため
