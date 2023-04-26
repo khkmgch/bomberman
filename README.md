@@ -66,6 +66,8 @@ https://bomberman-fawn.vercel.app/
 
 ２分ヒープを用いて、TopをO(1)、PopをO(logn)、InsertをO(logn)で行う優先度付きキューを実装しました。
 
+![priorityqueue](assets/priorityqueue.drawio.png)
+
 - **影響マップ**
 
 戦略的な重要度など、Npcの行動の指標となる評価を空間上に直接マッピングしたものです。
