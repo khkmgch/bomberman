@@ -46,18 +46,18 @@ https://bomberman-fawn.vercel.app/
 - フロントエンド
   - Vercel
 
-### 技術の採用理由
-- Typescript
+## 技術の採用理由
+- **Typescript**
   - これまでJavascriptで開発しており、型のあるTypesciptで書いてみたかった。
   - 今後、複数人で開発する際には型定義がある方が管理しやすいと考えた。
-- NestJS
+- **NestJS**
   - Typescriptで構築されたフレームワークである
   - MVC(Model-View-Controller)に基づいている
     - アプリの各部分をモジュールとして分割して開発や拡張ができるため
     - モデルとコントローラの分離により、ロジックとリクエストの処理を分けて管理できるため
-- Vite
+- **Vite**
 
-- Docker / Docker Compose / Google Cloud Build / Google Cloud Run
+- **Docker / Docker Compose / Google Cloud Build / Google Cloud Run**
 
 以前の開発で、開発環境と本番環境の違い(パッケージのバージョンなど)によりデプロイに失敗した経験がありました。
 
