@@ -22,6 +22,10 @@ https://bomberman-fawn.vercel.app/
 また、以前から気軽に集まれる楽しい場所と作りたいと考えており、
 
 小規模ですがそのような場所を提供するための第一歩になると考え、作成に至りました。
+
+## 期間
+
+
 ## 使用技術
 
 ![tech](assets/tech.drawio.png)
