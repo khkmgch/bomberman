@@ -155,7 +155,7 @@ https://bomberman-fawn.vercel.app/
 ![wireframe](assets/wireframe2.png)
 
 
-## 苦労した点
+## :muscle:苦労した点
 
 ### ①Npcのアルゴリズム
 先述の記事を参考にしながら、影響マップやAStarアルゴリズムなどを用いて
