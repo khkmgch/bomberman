@@ -129,7 +129,7 @@ https://bomberman-fawn.vercel.app/
 ![communication](assets/communication.drawio.png)
 
 ### ③拡張性
-継続的に開発してバージョンアップできるよう、OOPやAbstractFactoryパターンを用いて実装しました。
+継続的に開発してバージョンアップできるよう、OOPやAbstractFactoryパターンを用いて設計・実装しました。
 
 以下はUML(Unified Modeling Language)図です。
 
