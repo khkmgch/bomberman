@@ -134,16 +134,20 @@ https://bomberman-fawn.vercel.app/
 以下はUML(Unified Modeling Language)図です。
 
 - **クラス図**
-OOPで設計するため、関連・多重度・集約・継承などを意識しました。
+
+関連・多重度・集約・継承などを意識し、ゲーム内のオブジェクトをOOPで設計しました。
 
 ![classDiagram](assets/class.drawio.png)
 
 
 - **デザインパターン図**
+
+AbstractFactoryパターンを用いることで、複数の種類のステージを実装できるように設計しました。
+
 ![designPatternDiagram](assets/stage.drawio.png)
 
 ### ④Type Guard
-データの送受信を安全に行い予期しないエラーを防ぐため、Type Guardを用いてクライアント側で受け取るオブジェクトのデータ型を制限しました。
+データの送受信を型安全に行い予期しないエラーを防ぐため、Type Guardを用いてクライアント側で受け取るオブジェクトのデータ型を制限しました。
 
 参考: https://typescript-jp.gitbook.io/deep-dive/type-system/typeguard#riterarunotype-guard
 
