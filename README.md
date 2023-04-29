@@ -81,7 +81,7 @@ https://bomberman-fawn.vercel.app/
 
 そこで、ゲームアニメーションの描画を簡潔な記述で行えるPhaserライブラリを採用しました。
 
-## :green_book:こだわった箇所
+## :green_book:特にこだわった箇所
 ### ①Npcのアルゴリズム
 ゲームの難易度を上げて面白くするために、
 
