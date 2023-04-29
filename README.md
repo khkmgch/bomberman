@@ -38,9 +38,10 @@ https://bomberman-fawn.vercel.app/
 - Typescript
 - Vite
 ### バックエンド
-- NestJS(NodeJS)
+- NestJS(NodeJS)<img src="https://user-images.githubusercontent.com/101968115/235308482-97cc5e19-bdbc-47e3-9af4-8d8c4af22b92.png" width="64px">
+
 ### フロントエンド
-- Phaser3
+- Phaser3<img src="https://user-images.githubusercontent.com/101968115/235308535-6221fded-b64b-4f8a-bba0-93ac88425041.png" width="64px">
 ### 通信
 - Socket.io
 ### CI/CD
