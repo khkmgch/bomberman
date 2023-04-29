@@ -146,7 +146,7 @@ https://bomberman-fawn.vercel.app/
 ### ⑤UI
 ほっこりするようなデザインの素材を使い、一部素材は自作しました。
 
-## Draft
+## :scroll:Draft
 
 ### 全体の流れ
 ![flow](assets/flow.png)
