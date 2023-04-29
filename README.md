@@ -14,7 +14,7 @@ https://bomberman-fawn.vercel.app/
 最後まで生き残ると勝利です。
 
 ![usage](assets/usage.png)
-## 作成理由
+## :eyes:作成理由
 
 #### 気軽に集まれる場所を提供するため
 以前から気軽に集まれる楽しい場所と作りたいと考えており、
