@@ -51,21 +51,17 @@ https://bomberman-fawn.vercel.app/
   - Vercel
 
 ## それぞれの技術の採用理由
-- **Typescript**
+#### Typescript
   - これまでJavascriptで開発しており、型のあるTypesciptで書いてみたかった
   - 継続的に開発する際には型がある方が管理しやすいと考えた
-- **NestJS**
+#### NestJS
   - Typescriptで構築されたフレームワークである
   - MVC(Model-View-Controller)に基づいている
     - アプリの各部分をモジュールとして分割して開発や拡張ができるため
     - モデルとコントローラの分離により、ロジックとリクエストの処理を分けて管理できるため
-- **Vite**
 
-「ES modules」と呼ばれるモジュール分割の仕組みを使い、必要な時に必要なファイルだけをビルドします。
 
-プロジェクトの規模が拡大しても起動や更新が高速で行えるため採用しました。
-
-- **Docker / Docker Compose / Google Cloud Build / Google Cloud Run**
+#### Docker / Docker Compose / Google Cloud Build / Google Cloud Run
 
 以前の開発で、開発環境と本番環境の違い(パッケージのバージョンなど)によりデプロイに失敗した経験がありました。
 
@@ -73,7 +69,13 @@ https://bomberman-fawn.vercel.app/
 
 開発環境と本番環境を揃える方法を採用しました。
 
-- **Phaser**
+#### Vite
+
+「ES modules」と呼ばれるモジュール分割の仕組みを使い、必要な時に必要なファイルだけをビルドします。
+
+プロジェクトの規模が拡大しても起動や更新が高速で行えるため採用しました。
+
+#### Phaser
 
 最初はCanvasAPIのみで実装しており記述が煩雑でコード量が多くなってしまいました。
 
