@@ -136,7 +136,12 @@ https://bomberman-fawn.vercel.app/
 - **デザインパターン図**
 ![designPatternDiagram](assets/stage.drawio.png)
 
-### ④UI
+### ④Type Guard
+データの送受信を安全に行い予期しないエラーを防ぐため、Type Guardを用いてクライアント側で受け取るオブジェクトのデータ型を制限しました。
+
+参考: https://typescript-jp.gitbook.io/deep-dive/type-system/typeguard#riterarunotype-guard
+
+### ⑤UI
 ほっこりするようなデザインの素材を使い、一部素材は自作しました。
 
 ## Draft
