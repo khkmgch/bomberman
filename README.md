@@ -4,7 +4,7 @@
 インストールせずにブラウザで気軽に遊べます。
 ## :globe_with_meridians:Url
 https://bomberman-fawn.vercel.app/
-## Demo
+## 🖥️Demo
 ![demo](assets/demo.gif)
 ## :joystick:遊び方
 対戦ルームを作成、入室し、ゲームを開始します。
