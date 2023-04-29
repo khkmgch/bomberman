@@ -782,8 +782,12 @@ export class Npc extends Character {
       Array.from({ length: rows }, () => Infinity),
     );
     this.movableArea.forEach(({ i, j }: Index) => {
-      const valueOfItem: number = impactMapWithItem[i][j] * Constant.IMPACT_MAP_WEIGHT_COEFFICIENT.GET_ITEM.ITEM;
-      const valueOfExplosion: number = impactMapWithExplosion[i][j] * Constant.IMPACT_MAP_WEIGHT_COEFFICIENT.GET_ITEM.EXPLOSION;
+      const valueOfItem: number =
+        impactMapWithItem[i][j] *
+        Constant.IMPACT_MAP_WEIGHT_COEFFICIENT.GET_ITEM.ITEM;
+      const valueOfExplosion: number =
+        impactMapWithExplosion[i][j] *
+        Constant.IMPACT_MAP_WEIGHT_COEFFICIENT.GET_ITEM.EXPLOSION;
       impactMap[i][j] = Math.max(valueOfItem, valueOfExplosion);
     });
     return impactMap;
@@ -799,8 +803,12 @@ export class Npc extends Character {
       Array.from({ length: rows }, () => Infinity),
     );
     this.movableArea.forEach(({ i, j }: Index) => {
-      const valueOfObstacle: number = impactMapWithObstacle[i][j] * Constant.IMPACT_MAP_WEIGHT_COEFFICIENT.BREAK_OBSTACLE.OBSTACLE;
-      const valueOfExplosion: number = impactMapWithExplosion[i][j] * Constant.IMPACT_MAP_WEIGHT_COEFFICIENT.BREAK_OBSTACLE.EXPLOSION;
+      const valueOfObstacle: number =
+        impactMapWithObstacle[i][j] *
+        Constant.IMPACT_MAP_WEIGHT_COEFFICIENT.BREAK_OBSTACLE.OBSTACLE;
+      const valueOfExplosion: number =
+        impactMapWithExplosion[i][j] *
+        Constant.IMPACT_MAP_WEIGHT_COEFFICIENT.BREAK_OBSTACLE.EXPLOSION;
       impactMap[i][j] = Math.max(valueOfObstacle, valueOfExplosion);
     });
     return impactMap;
@@ -815,8 +823,12 @@ export class Npc extends Character {
       Array.from({ length: rows }, () => Infinity),
     );
     this.movableArea.forEach(({ i, j }: Index) => {
-      const valueOfCharacter: number = impactMapWithCharacter[i][j] * Constant.IMPACT_MAP_WEIGHT_COEFFICIENT.ATTACK_PLAYER.PLAYER;
-      const valueOfExplosion: number = impactMapWithExplosion[i][j] * Constant.IMPACT_MAP_WEIGHT_COEFFICIENT.ATTACK_PLAYER.EXPLOSION;
+      const valueOfCharacter: number =
+        impactMapWithCharacter[i][j] *
+        Constant.IMPACT_MAP_WEIGHT_COEFFICIENT.ATTACK_PLAYER.PLAYER;
+      const valueOfExplosion: number =
+        impactMapWithExplosion[i][j] *
+        Constant.IMPACT_MAP_WEIGHT_COEFFICIENT.ATTACK_PLAYER.EXPLOSION;
       impactMap[i][j] = Math.max(valueOfCharacter, valueOfExplosion);
     });
     return impactMap;
