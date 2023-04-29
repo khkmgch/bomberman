@@ -2,7 +2,7 @@
 最大４匹でリアルタイム対戦できるオンラインゲームです。
 
 インストールせずにブラウザで気軽に遊べます。
-## Url
+## :globe_with_meridians:Url
 https://bomberman-fawn.vercel.app/
 ## Demo
 ![demo](assets/demo.gif)
