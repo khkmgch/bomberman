@@ -30,7 +30,7 @@ https://bomberman-fawn.vercel.app/
 ## 期間
 2023年2月から2か月半ほど
 
-## :computer:使用技術
+## :hammer_and_wrench:使用技術
 
 ![tech](assets/tech.drawio.png)
 ### 開発
