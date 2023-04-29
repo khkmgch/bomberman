@@ -9,7 +9,7 @@ https://bomberman-fawn.vercel.app/
 ## :joystick:遊び方
 対戦ルームを作成、入室し、ゲームを開始します。
 
-↑ → ↓ ← で移動し、SpaceキーでBombを設置できます。
+⬆️ :arrow_right: ⬇️ ⬅️で移動し、SpaceキーでBombを設置できます。
 
 最後まで生き残ると勝利です。
 
