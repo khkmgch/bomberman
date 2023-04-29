@@ -50,7 +50,7 @@ https://bomberman-fawn.vercel.app/
 - フロントエンド
   - Vercel
 
-## それぞれの技術の採用理由
+## 📗それぞれの技術の採用理由
 #### Typescript
   - これまでJavascriptで開発しており、型のあるTypesciptで書いてみたかった
   - 継続的に開発する際には型がある方が管理しやすいと考えた
