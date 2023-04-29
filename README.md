@@ -134,9 +134,10 @@ https://bomberman-fawn.vercel.app/
 以下はUML(Unified Modeling Language)図です。
 
 - **クラス図**
+OOPで設計するため、関連・多重度・集約・継承などを意識しました。
+
 ![classDiagram](assets/class.drawio.png)
 
-OOPで実装するため、関連・多重度・集約・継承などを意識しました。
 
 - **デザインパターン図**
 ![designPatternDiagram](assets/stage.drawio.png)
