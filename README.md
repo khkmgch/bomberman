@@ -112,9 +112,9 @@ $$ o(NlogN) $$
 
 $$ f_n = f_{n-1} + h_n $$
 
-$$ h_n = manhattan distance + value of impactmap $$
+$$ h_n = ¥text{manhattan distance} + ¥text{value of impactmap} $$
 
-$$ manhattan distance = di(goal - n) + dj(goal - n) $$
+$$ ¥text{manhattan distance} = ¥text{di(goal - n)} + ¥text{dj(goal - n)} $$
 
 参考: https://2dgames.jp/a-star/
 
