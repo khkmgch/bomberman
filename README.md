@@ -114,7 +114,7 @@ $$ f_n = f_{n-1} + h_n $$
 
 $$ h_n = \text{manhattan distance} + \text{value of impactmap} $$
 
-$$ \text{manhattan distance} = \text{di(g_i - f_i)} + \text{dj(g_j - f_j)} $$
+$$ \text{manhattan distance} = \text{di(}g_i - f_i\text{)} + \text{dj(}g_j - f_j\text{)} $$
 
 参考: https://2dgames.jp/a-star/
 
