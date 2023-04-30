@@ -116,7 +116,7 @@ $$ h_n = \text{manhattan distance} + \text{value of impactmap} $$
 
 $$ \text{manhattan distance} = \text{di(}g_i - f_i\text{)} + \text{dj(}g_j - f_j\text{)} $$
 
-$$ g = \text{g = target cell} $$
+$$ g = \text{target cell} $$
 
 参考: https://2dgames.jp/a-star/
 
