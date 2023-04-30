@@ -101,7 +101,7 @@ https://bomberman-fawn.vercel.app/
 
 $$ f_n = f_{n-1} + g_n $$
 
-$$ o(NlogN) $$
+$$ \text{時間計算量: }o(NlogN) $$
 
 
 - **AStarアルゴリズム**
