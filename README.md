@@ -110,6 +110,12 @@ $$ o(NlogN) $$
 
 なお、ヒューリスティックコストにはマンハッタン距離に加えて、後述の影響マップの値を用いることで、ステージの状況をより正確に判断できるように工夫しました。
 
+$$ f_n = f_{n-1} + h_n $$
+
+$$ h_n = manhattan distance + value of impactmap $$
+
+$$ manhattan distance = di(goal - n) + dj(goal - n) $$
+
 参考: https://2dgames.jp/a-star/
 
 - **優先度付きキュー**
