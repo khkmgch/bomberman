@@ -101,7 +101,7 @@ https://bomberman-fawn.vercel.app/
 
 $$ f_n = f_{n-1} + g_n $$
 
-$$ \text{時間計算量: $o(NlogN)$} $$
+$$ \text{時間計算量: o(NlogN)} $$
 
 
 - **AStarアルゴリズム**
@@ -117,6 +117,8 @@ $$ h_n = \text{manhattan distance} + \text{value of impactmap} $$
 $$ \text{manhattan distance} = \text{di(}g_i - f_i\text{)} + \text{dj(}g_j - f_j\text{)} $$
 
 $$ g = \text{target cell} $$
+
+$$ \text{時間計算量: o(NlogN)} $$
 
 参考: https://2dgames.jp/a-star/
 
