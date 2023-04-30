@@ -97,21 +97,8 @@ https://bomberman-fawn.vercel.app/
 #### <経路探索に活用したアルゴリズム>
 - **ダイクストラ法** 
 
-$$ w_i = size_i \cdot W_0 + \frac{\sum(cor_{my} - cor_{opp})}{n_{opp}} \cdot W_1 $$
+$$ f_n = f_n-1 + g_n $$
 
-<p align="center">
-  where,
-</p>
-
-$$ w_i = \text{weight of piece } i $$
-
-$$ size_i = \text{size (length) of piece } i $$
-
-$$ cor_{my} = \text{number of corners for current player} $$
-
-$$ cor_{opp} = \text{number of corners for opponent players} $$
-
-$$ n_{opp} = \text{number of opponents} $$
 
 障害物を考慮して、Npcが移動できる範囲をO(n)で探索するため、後述の優先度付きキューを活用したダイクストラ法を用いました。
 
