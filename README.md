@@ -104,8 +104,8 @@ $$ f_n = f_{n-1} + g_n $$
 $$ \text{時間計算量: O(NlogN)} $$
 
 ###### 該当するコード
-- Npcが移動できる範囲を $O(NlogN)$ で探索: [updateMovableArea()](server/src/game/models/objects/character/Npc.ts) 557行目
-- 影響マップを作成: [createImpactMap()](server/src/game/utils/NpcUtil.ts) 13行目
+- [updateMovableArea()](server/src/game/models/objects/character/Npc.ts) (557行目): Npcが移動できる範囲を $O(NlogN)$ で探索
+- [createImpactMap()](server/src/game/utils/NpcUtil.ts) (13行目): 影響マップを作成
 ##### AStarアルゴリズム
 
 目標マスへの最適な経路を $O(NlogN)$ で探索するため、後述の優先度付きキューやメモ化を活用したAStarアルゴリズムを用いました。
@@ -125,8 +125,8 @@ $$ g = \text{target cell} $$
 $$ \text{時間計算量: O(NlogN)} $$
 
 ###### 該当するコード
-- 目標マスへの最適な経路を $O(NlogN)$ で探索: [updateRoute()](server/src/game/models/objects/character/Npc.ts) 408行目
-- AStarNode: [AStarNode](server/src/game/libs/AStar/AStarNode.ts)
+- [updateRoute()](server/src/game/models/objects/character/Npc.ts) (408行目): 目標マスへの最適な経路を $O(NlogN)$ で探索
+- [AStarNode](server/src/game/libs/AStar/AStarNode.ts)
 
 参考: https://2dgames.jp/a-star/
 
@@ -145,7 +145,7 @@ $$ \text{時間計算量: O(NlogN)} $$
 例えば、ステージのそれぞれのマスに対して、アイテムとの距離を評価値としてマッピングしたものを作成して使いました。
 
 ###### 該当するコード
-[createImpactMap()](server/src/game/utils/NpcUtil.ts) 13行目
+[createImpactMap()](server/src/game/utils/NpcUtil.ts) (13行目)
 
 参考: https://tech.cygames.co.jp/archives/2272/
 
