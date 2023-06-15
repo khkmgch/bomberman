@@ -95,7 +95,7 @@ https://bomberman-fawn.vercel.app/
 - 障害物を破壊
 
 #### <経路探索に活用したアルゴリズム>
-- **ダイクストラ法** 
+##### ダイクストラ法
 
 障害物を考慮して、Npcが移動できる範囲を $O(NlogN)$ で探索するため、後述の優先度付きキューを活用したダイクストラ法を用いました。
 
@@ -103,8 +103,10 @@ $$ f_n = f_{n-1} + g_n $$
 
 $$ \text{時間計算量: O(NlogN)} $$
 
-
-- **AStarアルゴリズム**
+###### 該当するコード
+- Npcが移動できる範囲を $O(NlogN)$ で探索: [updateMovableArea()](server/src/game/models/objects/character/Npc.ts) 557行目
+- 影響マップを作成: [createImpactMap()](server/src/game/utils/NpcUtil.ts) 13行目
+##### AStarアルゴリズム
 
 目標マスへの最適な経路を $O(NlogN)$ で探索するため、後述の優先度付きキューやメモ化を活用したAStarアルゴリズムを用いました。
 
@@ -122,19 +124,28 @@ $$ g = \text{target cell} $$
 
 $$ \text{時間計算量: O(NlogN)} $$
 
+###### 該当するコード
+- 目標マスへの最適な経路を $O(NlogN)$ で探索: [updateRoute()](server/src/game/models/objects/character/Npc.ts) 408行目
+- AStarNode: [AStarNode](server/src/game/libs/AStar/AStarNode.ts)
+
 参考: https://2dgames.jp/a-star/
 
-- **優先度付きキュー**
+##### 優先度付きキュー
 
 ２分ヒープを用いて、Topを $O(1)$ 、Popを $O(logN)$ 、Insertを $O(logN)$ で行う優先度付きキューを実装しました。
 
 ![priorityqueue](assets/priorityqueue.drawio.png)
 
-- **影響マップ**
+###### 該当するコード
+[priority queue](server/src/game/libs/PriorityQueue)
+##### 影響マップ
 
 戦略的な重要度など、Npcの行動の指標となる評価を空間上に直接マッピングしたものです。
 
 例えば、ステージのそれぞれのマスに対して、アイテムとの距離を評価値としてマッピングしたものを作成して使いました。
+
+###### 該当するコード
+[createImpactMap()](server/src/game/utils/NpcUtil.ts) 13行目
 
 参考: https://tech.cygames.co.jp/archives/2272/
 
