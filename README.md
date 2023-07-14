@@ -149,11 +149,17 @@ $$ \text{時間計算量: O(NlogN)} $$
 ### ③拡張性
 継続的に開発してバージョンアップできるよう、OOPやAbstractFactoryパターンを用いて設計・実装しました。
 
+また、各クラス
+
 以下はUML(Unified Modeling Language)図です。
 
 - **クラス図**
 
 関連・多重度・集約・継承などを意識し、ゲーム内のオブジェクトをOOPで設計しました。
+
+[意識した点]
+- 意図しない副作用を防ぐため、可視性修飾子（public/private/protected）を用いてカプセル化しました。  
+- メンバ変数へのアクセスは、getterやsetterを使用するようにしました。
 
 ![classDiagram](assets/class.drawio.png)
 
