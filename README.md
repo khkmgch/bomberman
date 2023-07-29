@@ -3,6 +3,8 @@
 インストールせずにブラウザで気軽に遊べます。
 ## :globe_with_meridians:Url
 https://bomberman-fawn.vercel.app/
+
+※ クラウド料金節約のため、サーバーを一時停止しています。再開までお待ちください。
 ## 🖥️Demo
 ![demo](assets/demo.gif)
 ## :joystick:遊び方
