@@ -66,6 +66,16 @@ https://bomberman-fawn.vercel.app/
 そこで、Dockerコンテナを使用して開発し、Cloud Buildを使ってコンテナ環境をデプロイすることによって、  
 開発環境と本番環境を揃える方法を採用しました。
 
+また、リアルタイム通信を行うため、レイテンシーを考慮してGoogle Cloudを選択しました。
+
+**GCP**
+![gcp](assets/gcp.png)
+**AWS**
+![gcp](assets/aws-1.png)
+![gcp](assets/aws-2.png)
+**Azure**
+![gcp](assets/azure.png)
+
 ### Vite
 
 「ES modules」と呼ばれるモジュール分割の仕組みを使い、必要な時に必要なファイルだけをビルドします。  
