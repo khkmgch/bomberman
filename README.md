@@ -185,6 +185,9 @@ AbstractFactoryパターンを用いることで、複数の種類のステー�
 ### ④Type Guard
 データの送受信を型安全に行い予期しないエラーを防ぐため、Type Guardを用いてクライアント側で受け取るオブジェクトのデータ型を制限しました。
 
+[該当するコード]  
+- [Guards](client/src/guards/guards.ts)
+
 参考: https://typescript-jp.gitbook.io/deep-dive/type-system/typeguard#riterarunotype-guard
 
 ### ⑤UI
