@@ -108,7 +108,7 @@ $$ \text{時間計算量: O(NlogN)} $$
 
 [該当するコード]
 - [updateMovableArea()](bomberman/tree/main/server/src/game/models/objects/character/Npc.ts) (557行目): Npcが移動できる範囲を $O(NlogN)$ で探索
-- [createImpactMap()](server/src/game/utils/NpcUtil.ts) (13行目): 影響マップを作成
+- [createImpactMap()](bomberman/tree/main/server/src/game/utils/NpcUtil.ts) (13行目): 影響マップを作成
 
 **AStarアルゴリズム**
 
@@ -128,8 +128,8 @@ $$ g = \text{target cell} $$
 $$ \text{時間計算量: O(NlogN)} $$
 
 [該当するコード]
-- [updateRoute()](server/src/game/models/objects/character/Npc.ts) (408行目): 目標マスへの最適な経路を $O(NlogN)$ で探索
-- [AStarNode](server/src/game/libs/AStar/AStarNode.ts)
+- [updateRoute()](bomberman/tree/main/server/src/game/models/objects/character/Npc.ts) (408行目): 目標マスへの最適な経路を $O(NlogN)$ で探索
+- [AStarNode](bomberman/tree/main/server/src/game/libs/AStar/AStarNode.ts)
 
 参考: https://2dgames.jp/a-star/
 
@@ -140,7 +140,7 @@ $$ \text{時間計算量: O(NlogN)} $$
 ![priorityqueue](assets/priorityqueue.drawio.png)
 
 [該当するコード]
-- [priority queue](server/src/game/libs/PriorityQueue)
+- [priority queue](bomberman/tree/main/server/src/game/libs/PriorityQueue)
 
 **影響マップ**
 
@@ -148,7 +148,7 @@ $$ \text{時間計算量: O(NlogN)} $$
 例えば、ステージのそれぞれのマスに対して、アイテムとの距離を評価値としてマッピングしたものを作成して使いました。
 
 [該当するコード]
-- [createImpactMap()](server/src/game/utils/NpcUtil.ts) (13行目)
+- [createImpactMap()](bomberman/tree/main/server/src/game/utils/NpcUtil.ts) (13行目)
 
 参考: https://tech.cygames.co.jp/archives/2272/
 
@@ -186,7 +186,7 @@ AbstractFactoryパターンを用いることで、複数の種類のステー�
 データの送受信を型安全に行い予期しないエラーを防ぐため、Type Guardを用いてクライアント側で受け取るオブジェクトのデータ型を制限しました。
 
 [該当するコード]  
-- [Guards](client/src/guards/guards.ts)
+- [Guards](bomberman/tree/main/client/src/guards/guards.ts)
 
 参考: https://typescript-jp.gitbook.io/deep-dive/type-system/typeguard#riterarunotype-guard
 
