@@ -107,7 +107,7 @@ $$ f_n = f_{n-1} + g_n $$
 $$ \text{時間計算量: O(NlogN)} $$
 
 [該当するコード]
-- [updateMovableArea()](bomberman/server/src/game/models/objects/character/Npc.ts) (557行目): Npcが移動できる範囲を $O(NlogN)$ で探索
+- [updateMovableArea()](bomberman/tree/main/server/src/game/models/objects/character/Npc.ts) (557行目): Npcが移動できる範囲を $O(NlogN)$ で探索
 - [createImpactMap()](server/src/game/utils/NpcUtil.ts) (13行目): 影響マップを作成
 
 **AStarアルゴリズム**
